@@ -8,3 +8,8 @@
 .agents/
 .project/
 .safeword-project/
+
+# Docket: frozen inputs that must stay byte-identical, and tool-managed files
+docs/PLAN.md
+test/fixtures/
+.openai/
