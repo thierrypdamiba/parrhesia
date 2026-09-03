@@ -104,9 +104,11 @@ export function sentenceCandidates(
   return out;
 }
 
+/** True when the last token of `s` (leading '(' or quotes dropped) is one of NO_SPLIT_AFTER. */
 function endsWithAbbreviation(s: string): boolean {
   const t = s.trimEnd();
-  return NO_SPLIT_AFTER.some(abbr => t.endsWith(abbr));
+  const lastToken = t.slice(t.lastIndexOf(' ') + 1).replace(/^["'(]+/, '');
+  return NO_SPLIT_AFTER.includes(lastToken);
 }
 
 /** Lowercase word set over `[a-z0-9']+` (4.2). */
