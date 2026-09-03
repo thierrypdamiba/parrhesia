@@ -49,6 +49,8 @@ export async function GET(
       window: queryInt(url, 'window', { min: 200, max: 1500, fallback: 1200 }),
       max_passages: queryInt(url, 'max_passages', { min: 1, max: 5, fallback: 1 }),
     });
+    // Passages are a pure function of the immutable text and the query string, so they carry
+    // the same ETag (a weak validator: the JSON body differs per query) and cache policy.
     return json(
       {
         document_number: rule.document_number,
@@ -57,7 +59,7 @@ export async function GET(
         pages: rule.pages,
         ...result,
       },
-      { headers: { 'cache-control': 'public, max-age=3600' } },
+      { headers: { etag: `W/${etag}`, 'cache-control': 'public, max-age=86400, immutable' } },
     );
   });
 }

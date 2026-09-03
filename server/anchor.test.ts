@@ -133,3 +133,21 @@ test('readPassages by start and by nothing', () => {
   assert.ok(total <= 4500);
   assert.ok(many.passages.every(p => p.end - p.start <= 1500));
 });
+
+test('sentenceCandidates: the abbreviation list is matched as whole tokens', () => {
+  const caps =
+    'THIS HEADING IS ALL CAPS AND ENDS IN FEDERAL. The next sentence stands on its own here.';
+  const c1 = sentenceCandidates(caps);
+  assert.equal(c1.length, 2, 'FEDERAL. is not the abbreviation L.');
+  assert.equal(c1[0].text, 'THIS HEADING IS ALL CAPS AND ENDS IN FEDERAL.');
+
+  const eo =
+    'The order is described in Takings (E.O. 12630) and it applies to every park unit here.';
+  const c2 = sentenceCandidates(eo);
+  assert.equal(c2.length, 1, 'no split after (E.O.');
+  assert.equal(c2[0].text, eo);
+
+  const pubL =
+    'This was enacted by Pub. L. 116-152 and it changed the statute in several ways here.';
+  assert.equal(sentenceCandidates(pubL).length, 1, 'no split after Pub. or L.');
+});

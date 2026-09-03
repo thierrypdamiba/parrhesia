@@ -314,8 +314,10 @@ def locate(text, pages, first_page, quote):
 
 
 def ends_with_abbreviation(s):
+    """True when the last token (leading '(' or quotes dropped) is one of NO_SPLIT_AFTER."""
     t = s.rstrip(JS_WS_CHARS)
-    return any(t.endswith(a) for a in NO_SPLIT_AFTER)
+    last_token = re.sub(r"^[\"'(]+", "", t[t.rfind(" ") + 1 :])
+    return last_token in NO_SPLIT_AFTER
 
 
 def sentence_candidates(text, min_chars=NEAREST_MIN_CANDIDATE_CHARS):
