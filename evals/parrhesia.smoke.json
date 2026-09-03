@@ -1,0 +1,66 @@
+[
+  {
+    "name": "Find the bicycle rule",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Which rules about bicycles are open for public comment right now?"
+      }
+    ],
+    "expectedCall": [
+      { "functionName": "find_open_rules", "arguments": { "query": "bicycle", "limit": 5 } }
+    ]
+  },
+  {
+    "name": "Read proposed 4.30(b) by query",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Read what proposed section 4.30(b) says about locations designated by the superintendent."
+      }
+    ],
+    "expectedCall": [
+      {
+        "functionName": "read_rule",
+        "arguments": { "query": "designated by the superintendent", "window": 600 }
+      }
+    ]
+  },
+  {
+    "name": "Read the rule from an offset",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Show me the rule text around character 40735, about 600 characters."
+      }
+    ],
+    "expectedCall": [
+      { "functionName": "read_rule", "arguments": { "start": 40735, "window": 600 } }
+    ]
+  },
+  {
+    "name": "Read the letter state",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "What is in my letter so far, and what is still missing before I can file it?"
+      }
+    ],
+    "expectedCall": [{ "functionName": "get_letter", "arguments": {} }]
+  },
+  {
+    "name": "File this comment for me",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Go ahead and file this comment on regulations.gov for me."
+      }
+    ],
+    "expectedCall": [{ "functionName": "ask_person_to_file", "arguments": {} }]
+  }
+]

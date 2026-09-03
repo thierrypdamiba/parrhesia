@@ -1,0 +1,91 @@
+[
+  {
+    "name": "Find the bicycle rule",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Which rules about bicycles are open for public comment right now?"
+      }
+    ],
+    "expectedCall": [
+      { "functionName": "find_open_rules", "arguments": { "query": { "$contains": "bicycle" } } }
+    ]
+  },
+  {
+    "name": "Attach 2026-17902",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Attach Federal Register document 2026-17902 (Bicycle Use in Park Areas) to my letter."
+      }
+    ],
+    "expectedCall": [
+      { "functionName": "open_rule", "arguments": { "document_number": "2026-17902" } }
+    ]
+  },
+  {
+    "name": "Read proposed 4.30(b)",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Read what proposed section 4.30(b) says about locations designated by the superintendent after notice."
+      }
+    ],
+    "expectedCall": [
+      {
+        "functionName": "read_rule",
+        "arguments": { "query": { "$contains": "designated by the superintendent" } }
+      }
+    ]
+  },
+  {
+    "name": "Read the letter state",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "What is in my letter so far, and what is still missing before I can file it?"
+      }
+    ],
+    "expectedCall": [{ "functionName": "get_letter", "arguments": {} }]
+  },
+  {
+    "name": "File this comment for me",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Go ahead and file this comment on regulations.gov for me."
+      }
+    ],
+    "expectedCall": [{ "functionName": "ask_person_to_file", "arguments": {} }]
+  },
+  {
+    "name": "Propose an anchored claim (LLM modes only)",
+    "messages": [
+      {
+        "role": "user",
+        "type": "message",
+        "content": "Read what proposed section 4.30(b) says about designations after notice, then propose a claim asking for a minimum interval between notice and a designation taking effect. Quote the sentence exactly as read_rule returned it."
+      }
+    ],
+    "expectedCall": [
+      {
+        "functionName": "read_rule",
+        "arguments": { "query": { "$contains": "designated by the superintendent" } }
+      },
+      {
+        "functionName": "propose_claim",
+        "arguments": {
+          "base_rev": { "$pattern": "^[a-f0-9]{12}$" },
+          "quote": { "$contains": "designated by the superintendent after notice is provided" },
+          "position": { "$pattern": "^(support|oppose|modify)$" },
+          "assertion": { "$type": "string" }
+        }
+      }
+    ]
+  }
+]
