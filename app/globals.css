@@ -1082,3 +1082,40 @@ pre.json {
   padding: 0 4px;
   border-radius: 3px;
 }
+
+/* "How agents use this site": the generated tool table and lists (PLAN.md 2.5) */
+.agents-subtitle {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  margin: 24px 0 6px;
+}
+.agents-list {
+  padding-left: 20px;
+  margin: 6px 0 0;
+}
+.agents-list li {
+  margin: 4px 0;
+}
+.tool-table-wrap {
+  overflow-x: auto;
+  margin: 8px 0 4px;
+}
+.tool-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.tool-table th,
+.tool-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 6px 8px;
+  border-top: 1px solid color-mix(in srgb, var(--muted) 35%, transparent);
+}
+.tool-table th {
+  font-weight: 600;
+  color: var(--muted);
+  border-top: 0;
+}

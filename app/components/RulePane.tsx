@@ -10,8 +10,19 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 
 import { describeError, getApi, type RuleMeta } from '@/lib/client/api';
 import { clock, cx, num } from '@/lib/client/format';
-import type { AgentRead } from '@/lib/client/agentReads';
 import type { AnchorStatus } from '@/server/types';
+
+/**
+ * A range the agent read through `read_rule` this page session (light-blue shading, "read by
+ * agent 14:03"). The WebMCP layer owns the ranges (src/webmcp/readRanges.ts, exposed as
+ * `RailStatus.readRanges`); the page only renders them.
+ */
+export interface AgentRead {
+  start: number;
+  end: number;
+  /** ISO timestamp of the read. */
+  at: string;
+}
 
 export interface AnchorMark {
   id: string;

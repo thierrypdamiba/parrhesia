@@ -1,8 +1,8 @@
 'use client';
 
-// Polls GET /api/letters/{id}/state?rev= every 4 s, paused while the tab is hidden, toasting
-// the newest activity line (PLAN.md 2.6 "Seeing each other"). Writes call `refresh()` right
-// after they land so the page never waits for the next tick.
+// Polls GET /api/letters/{id}/state?rev= every 4 s (the first load always runs; later polls
+// pause while the tab is hidden), toasting the newest activity line (PLAN.md 2.6 "Seeing each
+// other"). Writes call `refresh()` right after they land so the page never waits for the next tick.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -79,7 +79,10 @@ export function useLetterState(letterId: string | null): LetterStateHook {
     let stopped = false;
     const tick = async () => {
       if (stopped) return;
-      if (typeof document === 'undefined' || !document.hidden) await refresh();
+      // The first load always runs (a hidden or background tab must still show the letter);
+      // only the steady-state polling pauses while the tab is hidden.
+      if (revRef.current === null || typeof document === 'undefined' || !document.hidden)
+        await refresh();
       if (!stopped) timer = window.setTimeout(tick, POLL_MS);
     };
     void tick();

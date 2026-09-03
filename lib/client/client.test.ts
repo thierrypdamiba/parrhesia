@@ -7,7 +7,10 @@ import { actorLabel, clock, cx, deadline, shortDate } from './format';
 
 describe('inlineDiff', () => {
   it('marks removed and added words in place and keeps common words', () => {
-    const tokens = inlineDiff('publish the notice within 30 days', 'publish the notice within 60 days online');
+    const tokens = inlineDiff(
+      'publish the notice within 30 days',
+      'publish the notice within 60 days online',
+    );
     assert.deepEqual(tokens, [
       { kind: 'same', text: 'publish the notice within' },
       { kind: 'removed', text: '30' },
@@ -33,7 +36,10 @@ describe('format', () => {
   });
 
   it('renders deadline chips with the amber/red thresholds', () => {
-    assert.deepEqual(deadline('2026-11-02', 60), { text: 'closes Nov 2 · 60 days left', tone: 'plain' });
+    assert.deepEqual(deadline('2026-11-02', 60), {
+      text: 'closes Nov 2 · 60 days left',
+      tone: 'plain',
+    });
     assert.equal(deadline('2026-11-02', 14).tone, 'amber');
     assert.equal(deadline('2026-11-02', 3).tone, 'red');
     assert.equal(deadline('2026-11-02', 0).text, 'closes Nov 2 · closes today');

@@ -17,6 +17,7 @@ const SKIP = new Set([
   'out',
   'coverage',
   '.openai',
+  '.claude',
   'public',
 ]);
 

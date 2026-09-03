@@ -52,7 +52,7 @@ Computed from each tool's gates in `src/webmcp/schema.ts`; the page prints the s
 - ChatGPT's in-app browser supports imperative top-level tools only; in that host all eight tools are registered at load and gated inside execute, and the page's rail prints which would succeed now.
 - Chrome (149+, chrome://flags/#enable-webmcp-testing) shows live registration diffs: the tool list changes after open_rule and on every state change.
 - The held gesture exists because a host may click page buttons (webmcp issue #288); it raises the cost of automated clicking and is not proof of a person. The real guarantee is that no accept tool exists.
-- Host mode observed in ChatGPT: <recorded in Prompt 7>. Identity headers on fetch(): <recorded in Prompt 0>. Federal Register egress from the Worker: <recorded in Prompt 0>.
+- Mode selection: `auto` by default (dynamic when the browser reports Google Chrome, static otherwise); `?tool_mode=static` or `?tool_mode=dynamic` on any page forces one for host tests. Observations from the hosted ChatGPT build (mode, identity headers on fetch(), Federal Register egress) are not yet recorded here; until they are, the static path is the one every host is assumed to need.
 
 ## Try it
 

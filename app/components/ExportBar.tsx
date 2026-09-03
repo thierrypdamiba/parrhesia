@@ -4,8 +4,6 @@
 // download), the regulations.gov link (or the ADDRESSES fallback when the rule has no form),
 // copy the public and co-writing links, and the "Missing before filing" checklist.
 
-import { useState } from 'react';
-
 import { APP_NAME } from '@/lib/app';
 import { describeError, type LettersApi } from '@/lib/client/api';
 import { pushToast } from '@/lib/client/toasts';
@@ -29,7 +27,6 @@ async function copy(text: string, what: string): Promise<void> {
 }
 
 export function ExportBar({ state, api, compact }: ExportBarProps) {
-  const [preview, setPreview] = useState<string | null>(null);
   const rule = state.rule;
   const id = state.letter.id;
   const origin = () => window.location.origin;
@@ -48,15 +45,6 @@ export function ExportBar({ state, api, compact }: ExportBarProps) {
     }
   };
 
-  const showPreview = async () => {
-    if (!api) return;
-    try {
-      setPreview(await api.exportText(id));
-    } catch (err) {
-      pushToast(describeError(err), { tone: 'error' });
-    }
-  };
-
   return (
     <section className="card" aria-labelledby="export-title">
       <h2 className="section-title" id="export-title" style={{ marginTop: 0 }}>
@@ -69,11 +57,6 @@ export function ExportBar({ state, api, compact }: ExportBarProps) {
         <a className="btn" href={api?.exportUrl(id) ?? '#'} target="_blank" rel="noopener">
           Open export
         </a>
-        {process.env.NEXT_PUBLIC_DOCKET_MOCK === '1' ? (
-          <button type="button" className="btn btn-quiet btn-sm" onClick={() => void showPreview()}>
-            (mock) preview export
-          </button>
-        ) : null}
         {rule ? (
           rule.comment_url ? (
             <a className="btn btn-primary" href={rule.comment_url} target="_blank" rel="noopener">
@@ -121,17 +104,6 @@ export function ExportBar({ state, api, compact }: ExportBarProps) {
               ))}
             </ul>
           )}
-        </div>
-      ) : null}
-      {preview !== null ? (
-        <div className="field">
-          <div className="field-label">
-            <span className="term">Export preview (mock)</span>
-            <button type="button" className="btn btn-quiet btn-sm" onClick={() => setPreview(null)}>
-              close
-            </button>
-          </div>
-          <pre className="json">{preview}</pre>
         </div>
       ) : null}
     </section>

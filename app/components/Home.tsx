@@ -6,13 +6,13 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AgentsSection } from './AgentsSection';
 import { DeadlineChip } from './DeadlineChip';
-import { ToolRail } from './ToolRail';
 import { TopBar, type TopBarViewer } from './TopBar';
 import { APP_DESCRIPTION, APP_NAME } from '@/lib/app';
+import { toastToolCall } from '@/lib/client/agentReads';
 import {
   describeError,
   getApi,
@@ -22,6 +22,10 @@ import {
 } from '@/lib/client/api';
 import { clock } from '@/lib/client/format';
 import { pushToast } from '@/lib/client/toasts';
+import type { CallLogEntry } from '@/src/webmcp/guard';
+import { ToolRail } from '@/src/webmcp/rail';
+import type { PageState } from '@/src/webmcp/tools';
+import { useWebmcp } from '@/src/webmcp/useWebmcp';
 
 export function Home() {
   const router = useRouter();
@@ -40,6 +44,27 @@ export function Home() {
     judge ? 'Preparing your private judge copy…' : null,
   );
   const requestSeq = useRef(0);
+
+  // WebMCP (P5): unbound state, so the rail offers find_open_rules, open_rule, get_letter.
+  // open_rule creates the letter bound in one request (POST /api/letters {document_number}) and
+  // navigates to /l/{share_code} through the router.
+  const pageState = useMemo<PageState>(
+    () => ({
+      letter: null,
+      rule: null,
+      bound: false,
+      closed: false,
+      claimsAccepted: 0,
+      signedIn: viewer?.signed_in ?? false,
+      viewerName: viewer?.display_name ?? 'Signer',
+      canEdit: true,
+      isPublicView: false,
+    }),
+    [viewer],
+  );
+  const navigate = useCallback((path: string) => router.push(path), [router]);
+  const onCall = useCallback((entry: CallLogEntry) => toastToolCall(entry, viewer), [viewer]);
+  const rail = useWebmcp(pageState, { navigate, onCall });
 
   useEffect(() => {
     let alive = true;
@@ -127,7 +152,7 @@ export function Home() {
   return (
     <>
       <TopBar viewer={viewer} returnTo="/" />
-      <ToolRail context="home" />
+      <ToolRail status={rail} />
       <main className="page">
         {judge ? <div className="banner">{judgeNote ?? 'Preparing…'}</div> : null}
         <div className="home">

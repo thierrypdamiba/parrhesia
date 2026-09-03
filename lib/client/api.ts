@@ -1,7 +1,6 @@
 // Browser-side client for the HTTP contract in docs/API.md. Every write sends
-// `x-docket-actor: human` unless the caller (a tool execute, lane D) passes actor:'agent'.
-// The letters routes (P3) are lane B's; when NEXT_PUBLIC_DOCKET_MOCK=1 the same interface is
-// served by an in-browser mock (lib/client/mock.ts) so the UI can be exercised without them.
+// `x-docket-actor: human` unless the caller (a tool execute, src/webmcp/tools.ts) passes
+// actor:'agent'.
 
 import { ACTOR_HEADER } from '@/lib/app';
 import type {
@@ -206,7 +205,7 @@ export type ProposalBody =
   | { kind: 'edit'; claim_id: string; field: ClaimField; text: string }
   | { kind: 'impact'; text: string };
 
-/** Everything the pages need from the server. Two implementations: HTTP and the DEV mock. */
+/** Everything the pages need from the server (docs/API.md). */
 export interface LettersApi {
   me(): Promise<MeResponse>;
   rules(params: { query?: string; limit?: number }): Promise<RulesResponse>;
@@ -347,19 +346,10 @@ export const httpApi: LettersApi = {
     apiFetch('/api/judge/fork', { method: 'POST', body: reset ? { reset: true } : {} }),
 };
 
-/** DEV flag: NEXT_PUBLIC_DOCKET_MOCK=1 serves the letters contract from the browser (lane C only). */
-export const MOCK_ENABLED = process.env.NEXT_PUBLIC_DOCKET_MOCK === '1';
-
-let cached: LettersApi | null = null;
-
-/** The API the pages use. The mock is loaded lazily so production bundles never include it. */
+/**
+ * The API the pages use. Kept async so every caller stays on one code path; the letters routes
+ * (P3) are real now, so this is always the HTTP client.
+ */
 export async function getApi(): Promise<LettersApi> {
-  if (cached) return cached;
-  if (MOCK_ENABLED) {
-    const { mockApi } = await import('./mock');
-    cached = mockApi;
-  } else {
-    cached = httpApi;
-  }
-  return cached;
+  return httpApi;
 }

@@ -6,7 +6,8 @@
 // turns 409 STALE_REVISION into "Updated by <name>; reapply your edit".
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ActivityFeed } from './ActivityFeed';
 import { AddClaimForm } from './AddClaimForm';
@@ -18,9 +19,8 @@ import { LetterHeader } from './LetterHeader';
 import { ProposalCard } from './ProposalCard';
 import { RulePane, type AnchorMark } from './RulePane';
 import { SignersSection } from './SignersSection';
-import { ToolRail } from './ToolRail';
 import { TopBar } from './TopBar';
-import { getAgentReads, subscribeAgentReads } from '@/lib/client/agentReads';
+import { readsFromRail, toastToolCall } from '@/lib/client/agentReads';
 import { describeError, getApi, isFailure, type ClaimBody } from '@/lib/client/api';
 import { actorLabel, isoDate } from '@/lib/client/format';
 import { pushToast } from '@/lib/client/toasts';
@@ -32,6 +32,10 @@ import type {
   NearestPassage,
   PendingProposal,
 } from '@/server/types';
+import type { CallLogEntry } from '@/src/webmcp/guard';
+import { ToolRail } from '@/src/webmcp/rail';
+import type { PageState } from '@/src/webmcp/tools';
+import { useWebmcp } from '@/src/webmcp/useWebmcp';
 
 export interface WorkspaceProps {
   shareCode: string;
@@ -39,6 +43,7 @@ export interface WorkspaceProps {
 }
 
 export function Workspace({ shareCode, judge }: WorkspaceProps) {
+  const router = useRouter();
   const [letterId, setLetterId] = useState<string | null>(null);
   const [resolveError, setResolveError] = useState<string | null>(null);
   const { state, error, refresh, api } = useLetterState(letterId);
@@ -71,13 +76,49 @@ export function Workspace({ shareCode, judge }: WorkspaceProps) {
     };
   }, [shareCode]);
 
-  // Agent-read shading (recorded by the WebMCP layer's read_rule execute).
-  const docNumber = state?.rule?.document_number ?? null;
-  const reads = useSyncExternalStore(
-    subscribeAgentReads,
-    () => getAgentReads(docNumber),
-    () => getAgentReads(null),
+  // WebMCP (P5): the tool set is a pure function of this page state (2.3); every agent call
+  // re-fetches state at once and toasts with the actor's name (2.6). Until the letter loads the
+  // rail offers only the always-on tools.
+  const pageState = useMemo<PageState>(
+    () =>
+      state
+        ? {
+            letter: {
+              letter_id: state.letter.id,
+              share_code: state.letter.share_code,
+              public_token: state.letter.public_token,
+              rev: state.letter.rev,
+              rev_no: state.letter.rev_no,
+            },
+            rule: state.rule,
+            bound: state.rule !== null,
+            closed: state.closed,
+            claimsAccepted: state.claims.length,
+            signedIn: state.viewer.signed_in,
+            viewerName: state.viewer.display_name,
+            canEdit: state.viewer.can_edit,
+            isPublicView: false,
+          }
+        : {
+            letter: null,
+            rule: null,
+            bound: false,
+            claimsAccepted: 0,
+            signedIn: false,
+            viewerName: 'Signer',
+            canEdit: false,
+            isPublicView: false,
+          },
+    [state],
   );
+  const navigate = useCallback((path: string) => router.push(path), [router]);
+  const onLetterChanged = useCallback(() => void refresh(true), [refresh]);
+  const viewer = state?.viewer ?? null;
+  const onCall = useCallback((entry: CallLogEntry) => toastToolCall(entry, viewer), [viewer]);
+  const rail = useWebmcp(pageState, { navigate, onLetterChanged, onCall });
+
+  // Agent-read shading for the rule pane: the merged read_rule ranges this session (4.4).
+  const reads = useMemo(() => readsFromRail(rail), [rail]);
 
   // Unverified claims without cached nearest passages: ask the verifier once (no state change).
   useEffect(() => {
@@ -226,7 +267,7 @@ export function Workspace({ shareCode, judge }: WorkspaceProps) {
     return (
       <>
         <TopBar returnTo={returnTo} />
-        <ToolRail context="workspace" />
+        <ToolRail status={rail} />
         <main className="page">
           <div className="banner banner-error">
             <span>No letter for this link ({resolveError}).</span>
@@ -241,7 +282,7 @@ export function Workspace({ shareCode, judge }: WorkspaceProps) {
     return (
       <>
         <TopBar returnTo={returnTo} />
-        <ToolRail context="workspace" />
+        <ToolRail status={rail} />
         <main className="page">
           <p className="muted">
             {error ? `Could not load the letter: ${describeError(error)}` : 'Loading the letter…'}
@@ -262,7 +303,7 @@ export function Workspace({ shareCode, judge }: WorkspaceProps) {
   return (
     <>
       <TopBar viewer={state.viewer} returnTo={returnTo} />
-      <ToolRail context="workspace" />
+      <ToolRail status={rail} />
       <main className="page">
         {judge || state.letter.is_judge_copy ? (
           <JudgeBanner

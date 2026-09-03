@@ -3,18 +3,22 @@
 // Public read-only page /r/{public_token} (PLAN.md 2.2 item 8): the letter as a document,
 // no editing controls, the rule pane for reading, export links only.
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AgentsSection } from './AgentsSection';
 import { AnchorChip } from './ClaimCard';
 import { ExportBar } from './ExportBar';
 import { LetterHeader } from './LetterHeader';
 import { RulePane, type AnchorMark } from './RulePane';
-import { ToolRail } from './ToolRail';
 import { TopBar } from './TopBar';
+import { readsFromRail, toastToolCall } from '@/lib/client/agentReads';
 import { describeError, getApi } from '@/lib/client/api';
 import { POSITION_LABEL, YOUR_WORDS_LABEL, actorLabel, clock } from '@/lib/client/format';
 import { useLetterState } from '@/lib/client/useLetterState';
+import type { CallLogEntry } from '@/src/webmcp/guard';
+import { ToolRail } from '@/src/webmcp/rail';
+import type { PageState } from '@/src/webmcp/tools';
+import { useWebmcp } from '@/src/webmcp/useWebmcp';
 
 export function PublicLetter({ publicToken }: { publicToken: string }) {
   const [letterId, setLetterId] = useState<string | null>(null);
@@ -23,6 +27,34 @@ export function PublicLetter({ publicToken }: { publicToken: string }) {
   const [jump, setJump] = useState<{ id: string; nonce: number } | null>(null);
   const [tab, setTab] = useState<'letter' | 'rule'>('letter');
   const returnTo = `/r/${publicToken}`;
+
+  // WebMCP (P5, 2.2 item 8): the public page registers only get_letter and read_rule; nothing
+  // here writes. read_rule still shades what the agent read.
+  const pageState = useMemo<PageState>(
+    () => ({
+      letter: state
+        ? {
+            letter_id: state.letter.id,
+            public_token: state.letter.public_token,
+            rev: state.letter.rev,
+            rev_no: state.letter.rev_no,
+          }
+        : null,
+      rule: state?.rule ?? null,
+      bound: !!state?.rule,
+      closed: state?.closed ?? false,
+      claimsAccepted: state?.claims.length ?? 0,
+      signedIn: state?.viewer.signed_in ?? false,
+      viewerName: state?.viewer.display_name ?? 'Signer',
+      canEdit: false,
+      isPublicView: true,
+    }),
+    [state],
+  );
+  const viewer = state?.viewer ?? null;
+  const onCall = useCallback((entry: CallLogEntry) => toastToolCall(entry, viewer), [viewer]);
+  const rail = useWebmcp(pageState, { onCall });
+  const reads = useMemo(() => readsFromRail(rail), [rail]);
 
   useEffect(() => {
     let alive = true;
@@ -58,7 +90,7 @@ export function PublicLetter({ publicToken }: { publicToken: string }) {
     return (
       <>
         <TopBar returnTo={returnTo} />
-        <ToolRail context="public" />
+        <ToolRail status={rail} />
         <main className="page">
           <div className="banner banner-error">No letter for this link ({resolveError}).</div>
         </main>
@@ -69,7 +101,7 @@ export function PublicLetter({ publicToken }: { publicToken: string }) {
     return (
       <>
         <TopBar returnTo={returnTo} />
-        <ToolRail context="public" />
+        <ToolRail status={rail} />
         <main className="page">
           <p className="muted">{error ? describeError(error) : 'Loading…'}</p>
         </main>
@@ -80,7 +112,7 @@ export function PublicLetter({ publicToken }: { publicToken: string }) {
   return (
     <>
       <TopBar viewer={state.viewer} returnTo={returnTo} />
-      <ToolRail context="public" />
+      <ToolRail status={rail} />
       <main className="page">
         <div className="banner">
           <span>
@@ -178,7 +210,7 @@ export function PublicLetter({ publicToken }: { publicToken: string }) {
             <RulePane
               documentNumber={state.rule.document_number}
               anchors={anchors}
-              reads={[]}
+              reads={reads}
               jump={jump}
             />
           ) : (

@@ -1,41 +1,35 @@
-// Page-session record of what the agent read through `read_rule`, for the light-blue shading in
-// the rule pane ("read by agent 14:03", PLAN.md 2.2 item 2). The WebMCP layer (lane D,
-// src/webmcp/readRanges.ts) calls `recordAgentRead` from its read_rule execute; the page only
-// renders. Reset on reload by design (4.4 read-range allowlist lives there, not here).
+// Glue between the WebMCP layer's rail status and the page (PLAN.md 2.2 item 2, 2.6):
+// the merged read_rule ranges become the rule pane's light-blue shading ("read by agent 14:03"),
+// and every finished tool call becomes a toast that names the actor. The read ranges themselves
+// live in src/webmcp/readRanges.ts (reset on reload by design, 4.4).
 
-export interface AgentRead {
-  start: number;
-  end: number;
-  /** ISO timestamp of the read. */
-  at: string;
+import type { AgentRead } from '@/app/components/RulePane';
+import { actorLabel } from '@/lib/client/format';
+import { pushToast } from '@/lib/client/toasts';
+import type { CallLogEntry } from '@/src/webmcp/guard';
+import { formatCall } from '@/src/webmcp/guard';
+import type { RailStatus } from '@/src/webmcp/rail';
+
+/** Shading layers for the rule pane from the rail's merged ranges; stamped with the last read. */
+export function readsFromRail(rail: Pick<RailStatus, 'readRanges' | 'log'>): AgentRead[] {
+  if (rail.readRanges.length === 0) return [];
+  let at = '';
+  for (let i = rail.log.length - 1; i >= 0; i--) {
+    const e = rail.log[i];
+    if (e.tool === 'read_rule' && e.ok) {
+      at = e.at;
+      break;
+    }
+  }
+  if (!at) at = new Date().toISOString();
+  return rail.readRanges.map(([start, end]) => ({ start, end, at }));
 }
 
-type Listener = (reads: readonly AgentRead[]) => void;
-
-const byDocument = new Map<string, AgentRead[]>();
-const listeners = new Set<Listener>();
-
-export function recordAgentRead(
-  document_number: string,
-  range: { start: number; end: number },
+/** Toast one finished tool call as "<name>'s agent" / "an agent" (attribution per 2.6). */
+export function toastToolCall(
+  entry: CallLogEntry,
+  viewer: { signed_in: boolean; display_name: string } | null,
 ): void {
-  const list = [
-    ...(byDocument.get(document_number) ?? []),
-    { start: range.start, end: range.end, at: new Date().toISOString() },
-  ];
-  byDocument.set(document_number, list);
-  for (const l of listeners) l(list);
-}
-
-const EMPTY: readonly AgentRead[] = [];
-
-export function getAgentReads(document_number: string | null): readonly AgentRead[] {
-  return (document_number && byDocument.get(document_number)) || EMPTY;
-}
-
-export function subscribeAgentReads(listener: Listener | (() => void)): () => void {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
+  const who = actorLabel(`agent-of:${viewer?.signed_in ? viewer.display_name : 'anon'}`);
+  pushToast(formatCall(entry), { who, tone: entry.ok ? 'info' : 'error' });
 }
