@@ -138,3 +138,64 @@ test('the registered execute forwards to the spec and returns a plain object', a
   const result = await host.tools.get('get_letter')!.execute({ a: 1 });
   assert.deepEqual(result, { echoed: { a: 1 } });
 });
+
+test('an aborted pending registerTool promise is swallowed; other rejections become host_error', async () => {
+  // A host like Chrome's: registerTool returns a promise that stays pending until the tool is
+  // aborted, then rejects with AbortError. Aborting mid-registration must not surface anywhere.
+  const rejections: unknown[] = [];
+  const onUnhandled = (err: unknown) => rejections.push(err);
+  process.on('unhandledRejection', onUnhandled);
+  try {
+    const registered = new Set<string>();
+    const host: ModelContextHost = {
+      registerTool(tool, options) {
+        registered.add(tool.name);
+        return new Promise((_resolve, reject) => {
+          options?.signal?.addEventListener('abort', () => {
+            registered.delete(tool.name);
+            const err = new Error('registration aborted');
+            err.name = 'AbortError';
+            reject(err);
+          });
+        });
+      },
+      getTools() {
+        return [...registered].map(name => ({ name }));
+      },
+    };
+    const reg = new ToolRegistry(host, 'dynamic');
+    reg.sync([spec('get_letter'), spec('open_rule')]);
+    assert.deepEqual(reg.registered().sort(), ['get_letter', 'open_rule']);
+
+    reg.sync([spec('get_letter')]); // aborts open_rule while its promise is still pending
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(reg.registered(), ['get_letter']);
+    assert.equal(reg.snapshot().host_error, null, 'AbortError is not a host error');
+    assert.deepEqual(rejections, [], 'no unhandled rejection escaped');
+
+    reg.dispose();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(rejections, [], 'dispose aborts the rest without unhandled rejections');
+  } finally {
+    process.off('unhandledRejection', onUnhandled);
+  }
+});
+
+test('a registerTool promise that rejects for another reason is reported on the rail', async () => {
+  const host: ModelContextHost = {
+    registerTool() {
+      return Promise.reject(new Error('quota exceeded'));
+    },
+  };
+  const reg = new ToolRegistry(host, 'dynamic');
+  const seen: (string | null)[] = [];
+  reg.subscribe(s => seen.push(s.host_error));
+  reg.sync([spec('get_letter')]);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.match(reg.snapshot().host_error ?? '', /registerTool\(get_letter\) rejected: quota/);
+  assert.ok(
+    seen.some(e => e && /quota exceeded/.test(e)),
+    'listeners were notified',
+  );
+  reg.dispose();
+});

@@ -149,8 +149,18 @@ export class ToolRegistry {
         this.hostError = 'host has no registerTool';
         return;
       }
-      this.host.registerTool(descriptor, { signal: controller.signal });
+      const result = this.host.registerTool(descriptor, { signal: controller.signal });
       this.entries.set(spec.name, { controller, signature: signatureOf(spec) });
+      // A host whose registerTool returns a promise (Chrome) rejects it with AbortError when we
+      // abort a still-pending registration — a normal part of a dynamic-mode diff, so it is
+      // swallowed. Without this the rejection is unhandled and the dev overlay covers the page.
+      if (isThenable(result)) {
+        Promise.resolve(result).then(undefined, (err: unknown) => {
+          if (isAbortError(err, controller.signal)) return;
+          this.hostError = `registerTool(${spec.name}) rejected: ${message(err)}`;
+          this.emit();
+        });
+      }
     } catch (err) {
       this.hostError = `registerTool(${spec.name}) threw: ${message(err)}`;
     }
@@ -221,6 +231,17 @@ function namesOf(tools: unknown): ToolName[] | null {
     if (typeof name === 'string') names.push(name as ToolName);
   }
   return names;
+}
+
+/**
+ * True for the rejection a host produces when a registration is aborted: a DOMException named
+ * AbortError, or any rejection that arrives after we aborted that tool's signal ourselves.
+ */
+function isAbortError(err: unknown, signal: AbortSignal): boolean {
+  if (err && typeof err === 'object' && (err as { name?: unknown }).name === 'AbortError') {
+    return true;
+  }
+  return signal.aborted;
 }
 
 function message(err: unknown): string {
