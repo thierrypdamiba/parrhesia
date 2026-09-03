@@ -2,7 +2,14 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { APP_NAME } from '../lib/app';
-import { CLAIMANT, NOT_VERIFIED, claimLine, disclosureFooter, exportText } from './export';
+import {
+  CLAIMANT,
+  NOT_VERIFIED,
+  claimLine,
+  disclosureFooter,
+  exportText,
+  plainWordsLine,
+} from './export';
 import type { Claim, Letter, RuleCacheParsed, Signer } from './types';
 
 const NOW = '2026-09-03T14:05:00.000Z';
@@ -123,4 +130,25 @@ test('export: empty letter says so and falls back to the letter date', () => {
   assert.ok(text.includes('(no signers yet)'));
   assert.ok(text.includes('text fetched 2026-09-03.'));
   assert.ok(text.includes('- Maya (not yet signed)') === false);
+});
+
+test('export: a claim keeps a plain-words note when the claimant fields have suggestions', () => {
+  const slop = claim({
+    assertion: 'Additionally, this serves as a testament to the vibrant landscape.',
+    requested_change: 'Utilize plain words in order to fix it.',
+  });
+  assert.equal(plainWordsLine(slop), '[plain words: 7 suggestions not applied]');
+  const text = exportText(letter(), [slop], [signer], null);
+  const lines = text.split('\n');
+  const i = lines.findIndex(l => l.startsWith('1. [Modify]'));
+  assert.equal(lines[i + 1], '[plain words: 7 suggestions not applied]');
+
+  // A clean claim gets no note, and the quote is never checked or changed.
+  assert.equal(plainWordsLine(claim()), null);
+  const quoted = claim({
+    assertion: 'The rule says "a testament to the vibrant landscape" and I disagree.',
+    requested_change: '',
+  });
+  assert.equal(plainWordsLine(quoted), null);
+  assert.ok(exportText(letter(), [claim()], [], null).includes('[plain words:') === false);
 });

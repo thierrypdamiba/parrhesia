@@ -3,6 +3,7 @@
 // "[claimant's words]" because the page verifies quotes only; the footer discloses agent help.
 
 import { APP_NAME } from '../lib/app';
+import { checkPlainWordsFields, plainWordsExportLine } from '../lib/plain-words';
 import type { Claim, Letter, Position, RuleCacheParsed, Signer } from './types';
 
 const POSITION_LABEL: Record<Position, string> = {
@@ -21,6 +22,16 @@ export function disclosureFooter(document_number: string | null, fetchedDate: st
     `fetched ${fetchedDate}. Prepared with ${APP_NAME}, an agent-assisted drafting tool; ` +
     'filed by a person.'
   );
+}
+
+/**
+ * The plain-words note under a claim (docs/PLAIN-WORDS.md 2): the claimant's own fields were
+ * checked, the person saw the suggestions and chose to keep their words. The quote is never
+ * checked and never changed. Returns null when there is nothing to say.
+ */
+export function plainWordsLine(c: Claim): string | null {
+  const flags = checkPlainWordsFields([c.assertion, c.requested_change, c.evidence]);
+  return flags.length === 0 ? null : plainWordsExportLine(flags.length);
 }
 
 /** One numbered claim line: `N. [Position] Quoting page <page>: "<quote>" — …`. */
@@ -51,6 +62,8 @@ export function exportText(
   if (claims.length === 0) lines.push('(no claims yet)');
   claims.forEach((c, i) => {
     lines.push(claimLine(c, i + 1));
+    const plain = plainWordsLine(c);
+    if (plain) lines.push(plain);
     lines.push('');
   });
   lines.push('Signed by:');
