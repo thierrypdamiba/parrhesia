@@ -1,1 +1,32 @@
-{"abstract":"The National Park Service (NPS) proposes to modify the procedural requirements in existing NPS regulations for the designation of roads and trails for bicycle use within park areas. The changes would align NPS regulations with applicable Federal law and policy, remove unnecessary requirements, and ensure public involvement when needed. The changes in this rule would allow the NPS to manage its resources and allocate taxpayer funds more efficiently and streamline the approval of new and expanded opportunities for use and enjoyment of park areas by the American public.","action":"Proposed rule.","agencies":[{"raw_name":"DEPARTMENT OF THE INTERIOR","name":"Interior Department","id":253,"url":"https://www.federalregister.gov/agencies/interior-department","json_url":"https://www.federalregister.gov/api/v1/agencies/253","parent_id":null,"slug":"interior-department"},{"raw_name":"National Park Service","name":"National Park Service","id":362,"url":"https://www.federalregister.gov/agencies/national-park-service","json_url":"https://www.federalregister.gov/api/v1/agencies/362","parent_id":253,"slug":"national-park-service"}],"body_html_url":"https://www.federalregister.gov/documents/full_text/html/2026/09/01/2026-17902.html","cfr_references":[{"chapter":null,"citation_url":null,"part":"4","title":36}],"citation":"91 FR 56095","comment_url":"http://www.regulations.gov/commenton/NPS-2026-0166-0001","comments_close_on":"2026-11-02","correction_of":null,"corrections":[],"dates":"Comments on the proposed rule must be received by 11:59 p.m. ET on November 2, 2026.","disposition_notes":null,"docket_ids":["NPS-WASO-DTS#NPS0042897","PPMPRLE1Y.Y00000. 255P103601"],"dockets":[{"supporting_documents":[],"agency_name":"NPS","documents":[{"comment_count":22,"comment_start_date":"2026-09-01","updated_at":"2026-09-03T01:56:44.901-04:00","comment_url":"https://www.regulations.gov/commenton/NPS-2026-0166-0001","allow_late_comments":false,"id":"NPS-2026-0166-0001","comment_end_date":"2026-11-03","regulations_dot_gov_open_for_comment":true}],"supporting_documents_count":0,"id":"NPS-2026-0166","title":"Bicycle Use in Park Areas"}],"document_number":"2026-17902","effective_on":null,"end_page":56101,"executive_order_notes":null,"executive_order_number":null,"full_text_xml_url":"https://www.federalregister.gov/documents/full_text/xml/2026/09/01/2026-17902.xml","html_url":"https://www.federalregister.gov/documents/2026/09/01/2026-17902/bicycle-use-in-park-areas","images":{},"images_metadata":{},"json_url":"https://www.federalregister.gov/api/v1/documents/2026-17902?publication_date=2026-09-01","mods_url":"https://www.govinfo.gov/metadata/granule/FR-2026-09-01/2026-17902/mods.xml","not_received_for_publication":null,"page_length":7,"page_views":{"count":415,"last_updated":"2026-09-03 16:15:05 -0400"},"pdf_url":"https://www.govinfo.gov/content/pkg/FR-2026-09-01/pdf/2026-17902.pdf","presidential_document_number":null,"proclamation_number":null,"public_inspection_pdf_url":"https://public-inspection.federalregister.gov/2026-17902.pdf?1788180322","publication_date":"2026-09-01","raw_text_url":"https://www.federalregister.gov/documents/full_text/text/2026/09/01/2026-17902.txt","regulation_id_number_info":{"1024-AE97":{"issue":"202504","html_url":"https://www.federalregister.gov/regulations/1024-AE97/revisions-to-bicycle-regulations","title":"Revisions to Bicycle Regulations","xml_url":"http://www.reginfo.gov/public/do/eAgendaViewRule?pubId=202504&RIN=1024-AE97&operation=OPERATION_EXPORT_XML","priority_category":"Substantive, Nonsignificant"}},"regulation_id_numbers":["1024-AE97"],"regulations_dot_gov_info":{"supporting_documents":[],"regulatory_plan":{"html_url":"https://www.federalregister.gov/regulations/1024-AE97/revisions-to-bicycle-regulations","title":"Revisions to Bicycle Regulations"},"comments_count":22,"agency_id":"NPS","comments_url":"https://www.regulations.gov/docketBrowser?rpp=50&so=DESC&sb=postedDate&po=0&dct=PS&D=NPS-2026-0166","supporting_documents_count":0,"docket_id":"NPS-2026-0166","document_id":"NPS-2026-0166-0001","regulation_id_number":"1024-AE97","title":"Bicycle Use in Park Areas","checked_regulationsdotgov_at":"2026-09-03T20:55:04Z"},"regulations_dot_gov_url":"http://www.regulations.gov/commenton/NPS-2026-0166-0001","significant":false,"signing_date":null,"start_page":56095,"subtype":null,"title":"Bicycle Use in Park Areas","toc_doc":"Bicycle Use in Park Areas","toc_subject":null,"topics":[],"type":"Proposed Rule","volume":91}
+{
+  "document_number": "2026-17902",
+  "claims": [
+    {
+      "quote": "The use of bicycles and electric bicycles is allowed in other locations designated by the superintendent after notice is provided using one or more of the methods described in Sec. 1.7 of this chapter.",
+      "position": "modify",
+      "assertion": "Sec. 1.7 notice can be a bulletin-board posting; nothing in proposed 4.30(b) sets a minimum interval between notice and a designation taking effect.",
+      "requested_change": "Add to 4.30(b): a designation takes effect no sooner than 30 days after notice, and the notice is also posted on the park website."
+    },
+    {
+      "quote": "Written determinations for existing trails and for new trails within developed areas must be published in the Federal Register for 30 days of public comment.",
+      "position": "support",
+      "assertion": "Today existing-trail designations get a 30-day Federal Register comment period; that interval is how groups like ours learn about trail changes.",
+      "requested_change": "Keep a minimum notice interval for existing-trail designations under the new process."
+    },
+    {
+      "quote": "Written determinations for existing trails must be published in the Federal Register for 60 days of public comment.",
+      "position": "oppose",
+      "assertion": "Seeded on purpose with a paraphrase that is not in the rule, so the refusal path is visible without an agent.",
+      "requested_change": ""
+    }
+  ],
+  "pending": [
+    {
+      "kind": "claim",
+      "quote": "The superintendent would have authority to designate other locations, including administrative roads and trails, for bicycle and e-bike use except that rulemaking in the Federal Register would be required to allow bicycles or e-bikes in two circumstances.",
+      "position": "support",
+      "assertion": "Superintendent-level designation of administrative roads and trails would let parks open connector routes without a full rulemaking.",
+      "requested_change": "Publish each superintendent designation on the park website within 30 days."
+    }
+  ]
+}
