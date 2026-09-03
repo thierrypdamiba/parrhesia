@@ -15,7 +15,13 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit -p .",
     "test": "node scripts/test.mjs",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm test && npm run build"
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm test && npm run tools:doc && npm run build",
+    "tools:doc": "node --import tsx scripts/tools-doc.mjs",
+    "tools:doc:write": "node --import tsx scripts/tools-doc.mjs --write",
+    "evals:schema": "node --import tsx scripts/export-tool-schema.mjs",
+    "evals:smoke": "npx webmcp-evals@0.0.4 smoke -u \"${URL:-http://localhost:3101}/?judge=1\" -e evals/parrhesia.smoke.json -v",
+    "evals:api": "node scripts/smoke-letter.mjs \"${URL:-http://localhost:3101}\"",
+    "evals:local": "npx webmcp-evals@0.0.4 local -t evals/schema.json -e evals/parrhesia.evals.json"
   },
   "dependencies": {
     "next": "16.2.6",
