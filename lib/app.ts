@@ -1,11 +1,14 @@
 // Product identity. Import these everywhere; never hardcode the product name
 // (it changes before submission). PLAN.md sections 2.1, 4.1 item 1, section 8.
 
-export const APP_NAME = 'Docket';
+export const APP_NAME = 'Parrhesia';
 
-export const APP_TAGLINE =
-  'Co-write a public comment on a live federal rule with your agent. ' +
-  'Every quote is verified against the rule; every signer is a person; a person files.';
+export const APP_TAGLINE = 'Speak up for your rights. Your agent brings the receipts.';
+
+// Second line under the wordmark and the Devpost short description.
+export const APP_DESCRIPTION =
+  'You and your agent write a public comment on a live federal rule together. ' +
+  'Every quote is verified against the rule text; every signer is a person; only you sign and file.';
 
 // Integration replaces this with the production Sites URL (PLAN.md 4.1 item 1).
 export const SITE_URL = 'https://example.invalid';
