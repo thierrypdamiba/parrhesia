@@ -30,6 +30,7 @@ import type {
   ClaimField,
   LetterState,
   NearestPassage,
+  Occurrence,
   PendingProposal,
 } from '@/server/types';
 import type { CallLogEntry } from '@/src/webmcp/guard';
@@ -53,6 +54,8 @@ export function Workspace({ shareCode, judge }: WorkspaceProps) {
   }, [state]);
 
   const [nearestByClaim, setNearestByClaim] = useState<Record<string, NearestPassage[]>>({});
+  // Claims whose quote is unverified because it occurs more than once (2.2 item 3).
+  const [occurrencesByClaim, setOccurrencesByClaim] = useState<Record<string, Occurrence[]>>({});
   const verifying = useRef(new Set<string>());
   const [localStale, setLocalStale] = useState<
     Record<string, NonNullable<PendingProposal['stale']>>
@@ -135,6 +138,10 @@ export function Workspace({ shareCode, judge }: WorkspaceProps) {
             ? ((err.body.nearest as NearestPassage[] | undefined) ?? [])
             : [];
           setNearestByClaim(m => ({ ...m, [c.id]: nearest }));
+          if (isFailure(err, 'ANCHOR_AMBIGUOUS')) {
+            const occ = (err.body.occurrences as Occurrence[] | undefined) ?? [];
+            setOccurrencesByClaim(m => ({ ...m, [c.id]: occ }));
+          }
         })
         .finally(() => verifying.current.delete(c.id));
     }
@@ -193,9 +200,15 @@ export function Workspace({ shareCode, judge }: WorkspaceProps) {
       });
       if (field === 'quote') {
         setNearestByClaim(m => ({ ...m, [claim_id]: res.nearest ?? [] }));
+        setOccurrencesByClaim(m => ({ ...m, [claim_id]: res.occurrences ?? [] }));
         if (res.claim.anchor_status === 'anchored')
           pushToast(
             `Quote anchored · p. ${res.claim.page} · ${res.claim.anchor_start}–${res.claim.anchor_end}`,
+          );
+        else if (res.occurrences && res.occurrences.length > 1)
+          pushToast(
+            `Quote occurs ${res.occurrences.length} times in the rule; quote a longer span`,
+            { tone: 'error' },
           );
         else
           pushToast('Quote is not in the rule text; the nearest passages are on the card', {
@@ -227,9 +240,15 @@ export function Workspace({ shareCode, judge }: WorkspaceProps) {
       if (!s || !api) return;
       const res = await write(rev => api.addClaim(s.letter.id, rev, body), { quiet: true });
       setNearestByClaim(m => ({ ...m, [res.claim.id]: res.nearest ?? [] }));
+      setOccurrencesByClaim(m => ({ ...m, [res.claim.id]: res.occurrences ?? [] }));
       if (res.claim.anchor_status === 'anchored')
         pushToast(
           `Claim added · anchored p. ${res.claim.page} · ${res.claim.anchor_start}–${res.claim.anchor_end}`,
+        );
+      else if (res.occurrences && res.occurrences.length > 1)
+        pushToast(
+          `Claim added but the quote occurs ${res.occurrences.length} times in the rule; quote a longer span`,
+          { tone: 'error' },
         );
       else
         pushToast(
@@ -370,6 +389,7 @@ export function Workspace({ shareCode, judge }: WorkspaceProps) {
                 n={i + 1}
                 canEdit={canEdit}
                 nearest={c.anchor_status === 'anchored' ? undefined : nearestByClaim[c.id]}
+                occurrences={c.anchor_status === 'anchored' ? undefined : occurrencesByClaim[c.id]}
                 proposals={claimProposals(c.id)}
                 onPatch={(field, text) => onPatch(c.id, field, text)}
                 onDelete={hold =>

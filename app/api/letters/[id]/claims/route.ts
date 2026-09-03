@@ -1,6 +1,7 @@
 // POST /api/letters/:id/claims {base_rev, quote, position, assertion, requested_change?,
 // evidence?} → 201 "Add claim by hand": verified the same way; an unverified quote is stored
-// flagged with nearest passages returned for the card (docs/API.md).
+// flagged with nearest passages — or, when the quote occurs more than once, with those
+// occurrences — returned for the card (docs/API.md).
 import { addClaimByHand, assertBaseRev, requireOpen } from '@/server/letter';
 import {
   CLAIM_KEYS,
@@ -23,7 +24,7 @@ export async function POST(request: Request, ctx: IdParams): Promise<Response> {
     requireOpen(lc.letter);
     const input = claimInput(body);
     await assertBaseRev(lc.env, lc.letter, body.base_rev);
-    const { claim, nearest, write } = await addClaimByHand(
+    const { claim, nearest, occurrences, write } = await addClaimByHand(
       lc.env,
       lc.letter,
       rule,
@@ -37,6 +38,7 @@ export async function POST(request: Request, ctx: IdParams): Promise<Response> {
         rev: write.rev,
         rev_no: write.rev_no,
         ...(claim.anchor_status === 'unverified' ? { nearest } : {}),
+        ...(occurrences.length > 0 ? { occurrences } : {}),
       },
       201,
     );

@@ -20,6 +20,7 @@ import {
   requireHold,
   requireOpen,
   shortRev,
+  verifyHandQuote,
   wordDiff,
 } from './letter';
 import type { Claim, Letter, RuleCacheParsed, Signer, Snapshot, Viewer } from './types';
@@ -289,6 +290,43 @@ test('requireAnchor: exact substring, ANCHOR_NOT_FOUND with 3 nearest, ANCHOR_AM
   assert.ok(nearest[0].score > nearest[1].score);
   const amb = throws(() => requireAnchor(rule, dup), 422, 'ANCHOR_AMBIGUOUS');
   assert.equal((amb.body.occurrences as unknown[]).length, 2);
+});
+
+test('verifyHandQuote: a hand-typed quote that occurs twice is unverified, not anchored', () => {
+  const s1 =
+    'Written determinations for existing trails must be published for 30 days of public comment.';
+  const dup = 'This exact sentence appears twice in the rule text for the test.';
+  const text = `${s1} ${dup} Some other filler sentence that is long enough to count. ${dup}`;
+  const rule = { text, pages: [], first_page: 56095 } as unknown as RuleCacheParsed;
+
+  const unique = verifyHandQuote(rule, `  ${s1.replace('for', ' for')} `);
+  assert.equal(unique.anchor?.start, 0);
+  assert.equal(unique.anchor?.unique, true);
+  assert.deepEqual(unique.occurrences, []);
+  assert.deepEqual(unique.nearest, []);
+
+  const ambiguous = verifyHandQuote(rule, dup);
+  assert.equal(ambiguous.anchor, null, 'the first occurrence is not silently anchored');
+  assert.deepEqual(ambiguous.nearest, [], 'nearest passages are pointless when the quote is real');
+  assert.equal(ambiguous.occurrences.length, 2);
+  assert.deepEqual(ambiguous.occurrences[0], {
+    start: text.indexOf(dup),
+    end: text.indexOf(dup) + dup.length,
+    page: 56095,
+  });
+  assert.deepEqual(ambiguous.occurrences[1], {
+    start: text.lastIndexOf(dup),
+    end: text.lastIndexOf(dup) + dup.length,
+    page: 56095,
+  });
+
+  const missing = verifyHandQuote(
+    rule,
+    'Written determinations for existing trails must be published for 60 days of public comment.',
+  );
+  assert.equal(missing.anchor, null);
+  assert.equal(missing.nearest.length, 3);
+  assert.deepEqual(missing.occurrences, []);
 });
 
 test('missing-before-filing checklist', () => {

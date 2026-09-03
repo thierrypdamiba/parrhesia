@@ -15,7 +15,14 @@ import {
   clock,
   isAgentActor,
 } from '@/lib/client/format';
-import type { Claim, ClaimField, NearestPassage, PendingProposal, Position } from '@/server/types';
+import type {
+  Claim,
+  ClaimField,
+  NearestPassage,
+  Occurrence,
+  PendingProposal,
+  Position,
+} from '@/server/types';
 import { POSITIONS } from '@/server/types';
 
 export interface ClaimCardProps {
@@ -23,6 +30,8 @@ export interface ClaimCardProps {
   n: number;
   canEdit: boolean;
   nearest?: readonly NearestPassage[];
+  /** Set when the quote is unverified because it occurs more than once (2.2 item 3). */
+  occurrences?: readonly Occurrence[];
   /** Pending edit proposals targeting this claim. */
   proposals: readonly PendingProposal[];
   onPatch: (field: ClaimField, text: string) => Promise<void>;
@@ -31,7 +40,15 @@ export interface ClaimCardProps {
   onDecide: (proposal_id: string, decision: 'accept' | 'reject', hold_ms?: number) => Promise<void>;
 }
 
-export function AnchorChip({ claim, onJump }: { claim: Claim; onJump?: () => void }) {
+export function AnchorChip({
+  claim,
+  occurrences,
+  onJump,
+}: {
+  claim: Claim;
+  occurrences?: readonly Occurrence[];
+  onJump?: () => void;
+}) {
   if (
     claim.anchor_status === 'anchored' &&
     claim.anchor_start !== null &&
@@ -49,6 +66,13 @@ export function AnchorChip({ claim, onJump }: { claim: Claim; onJump?: () => voi
       </button>
     ) : (
       <span className="chip chip-anchored">{text}</span>
+    );
+  }
+  if (occurrences && occurrences.length > 1) {
+    return (
+      <span className="chip chip-unverified">
+        Ambiguous · occurs {occurrences.length} times · quote a longer span
+      </span>
     );
   }
   return <span className="chip chip-unverified">Unverified · not in rule text</span>;
@@ -76,6 +100,7 @@ export function ClaimCard({
   n,
   canEdit,
   nearest,
+  occurrences,
   proposals,
   onPatch,
   onDelete,
@@ -85,12 +110,17 @@ export function ClaimCard({
   const editsOn = (field: ClaimField) =>
     proposals.filter(p => p.kind === 'edit' && p.field === field);
   const unverified = claim.anchor_status !== 'anchored';
+  const ambiguous = !!occurrences && occurrences.length > 1;
 
   return (
     <article className="card" id={`claim-${claim.id}`} aria-label={`Claim ${n}`}>
       <div className="card-header">
         <span className="mono muted">Claim {n}</span>
-        <AnchorChip claim={claim} onJump={unverified ? undefined : onJump} />
+        <AnchorChip
+          claim={claim}
+          occurrences={occurrences}
+          onJump={unverified ? undefined : onJump}
+        />
         {canEdit ? (
           <select
             className={`pill pill-${claim.position}`}
@@ -118,9 +148,11 @@ export function ClaimCard({
         <div className="field-label">
           <span className="term">Quote</span>
           <span>
-            {unverified
-              ? 'must be copied from the rule text'
-              : 'verified against the rule text this page served'}
+            {ambiguous
+              ? `occurs ${occurrences!.length} times in the rule text`
+              : unverified
+                ? 'must be copied from the rule text'
+                : 'verified against the rule text this page served'}
           </span>
         </div>
         <EditableField
@@ -142,7 +174,21 @@ export function ClaimCard({
             onDecide={onDecide}
           />
         ))}
-        {unverified && nearest && nearest.length > 0 ? (
+        {ambiguous ? (
+          <div className="nearest">
+            <div className="nearest-title">
+              This quote appears more than once in the rule, so the page will not say which one you
+              mean. Quote a longer span. It occurs at:
+            </div>
+            {occurrences!.map((oc, i) => (
+              <div className="nearest-item" key={`${oc.start}-${i}`}>
+                <span className="chip chip-muted">
+                  p. {oc.page} · {oc.start}–{oc.end}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : unverified && nearest && nearest.length > 0 ? (
           <div className="nearest">
             <div className="nearest-title">
               Not in the rule. The three nearest real passages (offsets and Federal Register page

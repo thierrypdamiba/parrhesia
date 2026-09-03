@@ -27,7 +27,7 @@ export async function PATCH(request: Request, ctx: IdParams<'cid'>): Promise<Res
     requireOpen(lc.letter);
     const { field, text } = editInput(body);
     await assertBaseRev(lc.env, lc.letter, body.base_rev);
-    const { claim, nearest, write } = await editClaimField(
+    const { claim, nearest, occurrences, write } = await editClaimField(
       lc.env,
       lc.letter,
       rule,
@@ -41,6 +41,7 @@ export async function PATCH(request: Request, ctx: IdParams<'cid'>): Promise<Res
       rev: write.rev,
       rev_no: write.rev_no,
       ...(field === 'quote' && claim.anchor_status === 'unverified' ? { nearest } : {}),
+      ...(occurrences.length > 0 ? { occurrences } : {}),
     });
   });
 }

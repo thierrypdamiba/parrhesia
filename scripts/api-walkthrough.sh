@@ -14,6 +14,7 @@ Q3='The use of bicycles and electric bicycles is allowed in other locations desi
 Q1='Written determinations for existing trails and for new trails within developed areas must be published in the Federal Register for 30 days of public comment.'
 Q2='The superintendent would have authority to designate other locations, including administrative roads and trails, for bicycle and e-bike use except that rulemaking in the Federal Register would be required to allow bicycles or e-bikes in two circumstances.'
 BAD='Written determinations for existing trails must be published in the Federal Register for 60 days of public comment.'
+AMBIG='bicycles and electric bicycles'  # a real fragment, but it occurs 3 times in 2026-17902
 ASSERT='Notice under Sec. 1.7 can be a bulletin-board posting; nothing sets a minimum interval before a designation takes effect.'
 
 # call <label> <method> <path> <jar> [json-body] [extra curl args...]
@@ -173,6 +174,24 @@ call 'B: POST /claims by hand with the BAD quote' POST "/api/letters/$LB/claims"
 expect 201 '.claim.anchor_status' unverified
 echo "  nearest[0] $(j '.nearest[0] | "\(.score)@\(.start) p.\(.page)"'); rev_no $(j .rev_no)"
 RB="$(j .rev)"; CB="$(j .claim.id)"
+call 'B: POST /claims by hand with an ambiguous quote' POST "/api/letters/$LB/claims" "$OWNER" \
+  "$(json --arg r "$RB" --arg q "$AMBIG" --arg a "$ASSERT" '{base_rev:$r, quote:$q, position:"modify", assertion:$a}')"
+expect 201 '.claim.anchor_status' unverified
+expect 201 '.occurrences | length' 3
+echo "  occurrences: $(j '[.occurrences[] | "\(.start)–\(.end) p.\(.page)"] | join(" · ")'); anchor_start $(j .claim.anchor_start)"
+RB="$(j .rev)"; CA="$(j .claim.id)"
+call 'B: PATCH that quote to a unique longer span' PATCH "/api/letters/$LB/claims/$CA" "$OWNER" \
+  "$(json --arg r "$RB" --arg q "$Q1" '{base_rev:$r, field:"quote", text:$q}')"
+expect 200 '.claim | "\(.anchor_status) \(.anchor_start) \(.page)"' 'anchored 20073 56098'
+RB="$(j .rev)"
+call 'B: PATCH it back to the ambiguous quote' PATCH "/api/letters/$LB/claims/$CA" "$OWNER" \
+  "$(json --arg r "$RB" --arg q "$AMBIG" '{base_rev:$r, field:"quote", text:$q}')"
+expect 200 '.claim | "\(.anchor_status) \(.anchor_start) \(.page)"' 'unverified null null'
+expect 200 '.occurrences | length' 3
+RB="$(j .rev)"
+call 'B: DELETE the ambiguous claim (held)' DELETE "/api/letters/$LB/claims/$CA" "$OWNER" "$(json --arg r "$RB" '{base_rev:$r, hold_ms:800}')"
+expect 200
+RB="$(j .rev)"
 call 'B: POST /claims as agent (refused: by-hand is human)' POST "/api/letters/$LB/claims" "$OWNER" \
   "$(json --arg r "$RB" --arg q "$Q1" --arg a "$ASSERT" '{base_rev:$r, quote:$q, position:"support", assertion:$a}')" -H 'x-docket-actor: agent'
 expect 403 '.error' FORBIDDEN

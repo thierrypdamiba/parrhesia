@@ -281,11 +281,11 @@ export const TOOLS: Readonly<Record<ToolName, ToolStatic>> = {
     title: 'Propose a claim card (verified quote)',
     description:
       'Propose a claim card: a verbatim quote from the rule, a position, an assertion and a ' +
-      'requested change. The page verifies the quote is an exact substring of the rule text; ' +
-      'quotes must be copied from read_rule output served in this session (verifier norm-1). ' +
-      'A paraphrase is refused with ANCHOR_NOT_FOUND and the three nearest real passages; an ' +
-      'unread quote with ANCHOR_NOT_READ and the read_rule call to make. Nothing applies until ' +
-      'a person holds Accept; there is no accept tool.',
+      'requested change. The page verifies it; quotes must be copied from read_rule output ' +
+      'served in this session (verifier norm-1). A paraphrase is refused with ' +
+      'ANCHOR_NOT_FOUND, an unread quote with ANCHOR_NOT_READ. Write assertion and ' +
+      'requested_change in plain first-person words; the page runs a plain-words check and ' +
+      'shows suggestions. Nothing applies until a person holds Accept; there is no accept tool.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -402,10 +402,11 @@ export const TOOLS: Readonly<Record<ToolName, ToolStatic>> = {
     title: 'Draft an impact statement for {display_name}',
     description:
       'Draft an impact statement for the person who is signed in on this page, describing how ' +
-      'the rule affects them. The statement lands as a pending proposal on their own signer ' +
-      'block; identity comes from the Sign in with ChatGPT session, never from arguments, so ' +
-      'there is no way to write for anyone else. That person must hold Accept, then hold Sign. ' +
-      'Nothing applies until a person holds Accept; there is no accept tool.',
+      'the rule affects them. It lands as a pending proposal on their signer block; identity ' +
+      'comes from the Sign in with ChatGPT session, never from arguments, so there is no way ' +
+      'to write for anyone else. Write it in plain first-person words; the page runs a ' +
+      'plain-words check and shows suggestions. That person must hold Accept, then hold Sign; ' +
+      'there is no accept tool.',
     inputSchema: {
       type: 'object',
       properties: {

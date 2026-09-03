@@ -9,6 +9,7 @@ import type {
   Claim,
   ClaimField,
   NearestPassage,
+  Occurrence,
   OpenRule,
   Position,
   ProposalKind,
@@ -173,6 +174,8 @@ export interface ClaimWriteResult {
   rev: string;
   rev_no: number;
   nearest?: NearestPassage[];
+  /** Present when the quote is unverified because it occurs more than once (2.2 item 3). */
+  occurrences?: Occurrence[];
 }
 
 export interface RevResult {

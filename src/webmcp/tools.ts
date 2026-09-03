@@ -6,6 +6,7 @@
 // with history.pushState. Nothing here accepts, deletes, signs or files.
 
 import { ACTOR_HEADER, APP_NAME } from '../../lib/app';
+import { PLAIN_WORDS_GUIDE, checkPlainWordsFields } from '../../lib/plain-words';
 import type {
   ApiError,
   AskPersonToFileOutput,
@@ -16,6 +17,7 @@ import type {
   NearestPassage,
   OpenRuleOutput,
   Passage,
+  PlainWordsSummary,
   ProposeClaimOutput,
   ProposeEditOutput,
   ReadRuleOutput,
@@ -343,6 +345,30 @@ function noRule(): ToolError {
   return toolError('NO_RULE', 'No rule is attached to this letter; call open_rule first.');
 }
 
+/** Flags in a tool result, so an agent can fix its own draft (docs/PLAIN-WORDS.md 4). */
+const PLAIN_WORDS_TOP = 3;
+
+/**
+ * The plain-words check over the claimant's own fields. Suggestions only: never an error, never
+ * a rewrite, and the quote is never passed in. Previews keep the result inside its budget.
+ */
+function plainWordsSummary(fields: readonly (string | null | undefined)[]): PlainWordsSummary {
+  const flags = checkPlainWordsFields(fields);
+  return {
+    flags: flags.length,
+    top: flags.slice(0, PLAIN_WORDS_TOP).map(f => ({
+      title: f.title,
+      excerpt: preview(f.excerpt, 60),
+      fix: preview(f.fix, 100),
+    })),
+  };
+}
+
+/** A claimant field from tool input, as text. */
+function fieldText(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
 function findOpenRules(ctx: ToolContext): Impl {
   return async (input, state) => {
     const params = new URLSearchParams();
@@ -594,6 +620,11 @@ function proposeClaim(ctx: ToolContext): Impl {
       },
       needs_human: NEEDS_HUMAN_ACCEPT,
       pending_count: Number(body.pending_count ?? 1),
+      plain_words: plainWordsSummary([
+        fieldText(input.assertion),
+        fieldText(input.requested_change),
+        fieldText(input.evidence),
+      ]),
       next: 'The card is on the page. A person must hold Accept; keep using the same base_rev until get_letter shows a new rev.',
     };
     ctx.onLetterChanged?.();
@@ -662,6 +693,7 @@ function draftMyImpact(ctx: ToolContext): Impl {
       for: name,
       preview: preview(text, 120),
       needs_human: `${name} must hold Accept, then Sign`,
+      plain_words: plainWordsSummary([text]),
       next: `${name} reviews the draft on their own signer block; only they can accept it.`,
     };
     ctx.onLetterChanged?.();
@@ -713,6 +745,9 @@ function getLetter(ctx: ToolContext): Impl {
       quote_preview: preview(c.quote, 60),
       assertion_preview: preview(c.assertion, 60),
       has_requested_change: c.requested_change.trim().length > 0,
+      plain_words: {
+        flags: checkPlainWordsFields([c.assertion, c.requested_change, c.evidence]).length,
+      },
     }));
     const pending = fresh.pending.map(p => ({
       proposal_id: p.proposal_id,
@@ -758,10 +793,19 @@ function getLetter(ctx: ToolContext): Impl {
       },
       tools_now: toolsNow(gates),
       tools_not_now: toolsNotNow(gates),
+      writing_guide: PLAIN_WORDS_GUIDE,
       next,
     };
-    // Claims are the first array to give way (section 3 budgets), keeping '+N more' honest.
-    while (jsonLength(out) > OUTPUT_BUDGETS.get_letter && out.claims.length > 1) {
+    // Previews give way first, then claims (docs/PLAIN-WORDS.md 4), keeping '+N more' honest.
+    const over = () => jsonLength(out) > OUTPUT_BUDGETS.get_letter;
+    for (const cap of [40, 24]) {
+      if (!over()) break;
+      for (const c of out.claims) {
+        c.quote_preview = preview(c.quote_preview, cap);
+        c.assertion_preview = preview(c.assertion_preview, cap);
+      }
+    }
+    while (over() && out.claims.length > 1) {
       out.claims.pop();
       out.more_claims = `+${fresh.claims.length - out.claims.length} more`;
     }

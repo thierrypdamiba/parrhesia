@@ -24,7 +24,7 @@ person. The quote field is exempt: it is the rule's text and must not change.
      Y", adverbs on weak verbs (a short list: quickly, significantly, seamlessly, effectively,
      truly, really, very).
    - `checkPlainWords(text): { flags: Flag[]; score: number }` where `Flag = { rule_id, title,
-     start, end, excerpt, fix, source }`, `score` = flags per 100 words (0 is clean). Case
+start, end, excerpt, fix, source }`, `score` = flags per 100 words (0 is clean). Case
      insensitive; word boundaries; never flags inside a quoted span (text between straight or
      curly double quotes) so quoted rule text is never touched.
    - `PLAIN_WORDS_GUIDE`: a ≤600-char string for agents, derived from the skill's "Adding soul"
@@ -32,8 +32,8 @@ person. The quote field is exempt: it is the rule's text and must not change.
      sentence; say what the rule does to you, with a number or a place; no em dashes; no
      "not just X but Y"; no filler; name the mechanism, not the feeling.
    - `CREDIT`: `{ name: 'unslop', author: 'Lauren Tan (poteto)', url, license: 'MIT' }`.
-   Tests: every rule fires on its own example from the skill and is silent on a clean sentence;
-   the quote exemption holds; the guide is ≤600 chars.
+     Tests: every rule fires on its own example from the skill and is silent on a clean sentence;
+     the quote exemption holds; the guide is ≤600 chars.
 
 2. Server. `GET /api/plain-words?text=` is not needed; the check is pure and runs on the page.
    The export (`server/export.ts`) appends one line under each claim when flags exist:
@@ -50,12 +50,12 @@ person. The quote field is exempt: it is the rule's text and must not change.
 
 4. Tools (`src/webmcp/schema.ts` descriptions and outputs; no new tool):
    - `propose_claim.description` gains one sentence: `Write assertion and requested_change in
-     plain first-person words; the page runs a plain-words check and shows suggestions.`
+plain first-person words; the page runs a plain-words check and shows suggestions.`
    - `draft_my_impact.description` gains the same sentence.
    - `get_letter` output: each claim preview gains `plain_words: { flags: N }`; the letter gains
      `writing_guide: PLAIN_WORDS_GUIDE` once (budget stays ≤1800; trim previews first).
    - `propose_claim` and `draft_my_impact` results gain `plain_words: { flags: N, top: [{title,
-     excerpt, fix}] ≤3 }` so the agent can fix its own draft on the next proposal.
+excerpt, fix}] ≤3 }` so the agent can fix its own draft on the next proposal.
 
 5. Docs. README gets a `## Plain words` section (what it checks, that it never blocks, the
    credit). `docs/TOOLS.md` regenerates. The Devpost text gets one sentence in the "better user

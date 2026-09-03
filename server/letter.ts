@@ -22,6 +22,7 @@ import {
   type Letter,
   type LetterState,
   type NearestPassage,
+  type Occurrence,
   type PendingProposal,
   type Position,
   type Proposal,
@@ -634,6 +635,32 @@ export interface Verdict {
   nearest: NearestPassage[];
 }
 
+/**
+ * How a hand-typed quote resolved: `anchor` only when it locates exactly once. A quote that
+ * occurs more than once is stored unverified with its occurrences, so the card can say where
+ * the copies are instead of silently anchoring the first one (2.2 item 3).
+ */
+export interface HandVerdict {
+  anchor: Anchor | null;
+  nearest: NearestPassage[];
+  occurrences: Occurrence[];
+}
+
+export function verifyHandQuote(rule: RuleCacheParsed, quote: string): HandVerdict {
+  const v = verifyQuote(rule, quote);
+  if (v.anchor && !v.anchor.unique) {
+    return { anchor: null, nearest: [], occurrences: v.anchor.occurrences };
+  }
+  return { anchor: v.anchor, nearest: v.nearest, occurrences: [] };
+}
+
+/** The unverified half of the activity summary and the card's reason (2.2 item 3). */
+function unverifiedReason(v: HandVerdict): string {
+  return v.occurrences.length > 0
+    ? `UNVERIFIED: the quote occurs ${v.occurrences.length} times; quote a longer span`
+    : `UNVERIFIED: quote not in rule text; ${v.nearest.length} nearest passages shown`;
+}
+
 export function verifyQuote(rule: RuleCacheParsed, quote: string): Verdict {
   const anchor = locate(rule.text, rule.pages, rule.first_page, quote);
   if (anchor) return { anchor, nearest: [] };
@@ -767,18 +794,23 @@ export async function addClaimByHand(
   rule: RuleCacheParsed,
   actor: Actor,
   input: ClaimInput,
-): Promise<{ claim: Claim; nearest: NearestPassage[]; write: WriteResult }> {
+): Promise<{
+  claim: Claim;
+  nearest: NearestPassage[];
+  occurrences: Occurrence[];
+  write: WriteResult;
+}> {
   const claims = await loadClaims(env, letter.id);
   if (claims.length >= LIMITS.claims_per_letter)
     fail(409, 'LIMIT', `a letter holds at most ${LIMITS.claims_per_letter} claims`);
   const signers = await loadSigners(env, letter.id);
-  const v = verifyQuote(rule, input.quote);
-  const anchor = v.anchor && v.anchor.unique ? v.anchor : v.anchor ? { ...v.anchor } : null;
+  const v = verifyHandQuote(rule, input.quote);
+  const anchor = v.anchor;
   const claim = claimRow(letter.id, (claims.at(-1)?.ord ?? 0) + 1, input, anchor, null, actor);
   const n = claims.length + 1;
   const summary = anchor
     ? `${actorLabel(actor)} added claim ${n} by hand · anchored p. ${anchor.page} · ${anchor.start}–${anchor.end}`
-    : `${actorLabel(actor)} added claim ${n} by hand · UNVERIFIED: quote not in rule text; ${v.nearest.length} nearest passages shown`;
+    : `${actorLabel(actor)} added claim ${n} by hand · ${unverifiedReason(v)}`;
   const write = await writeRevision(env, {
     letter,
     actor,
@@ -788,7 +820,7 @@ export async function addClaimByHand(
     signers,
     statements: [insertClaimStmt(env, claim)],
   });
-  return { claim, nearest: v.nearest, write };
+  return { claim, nearest: v.nearest, occurrences: v.occurrences, write };
 }
 
 /** Human inline edit of one field; quote edits re-verified; stale-marks pending edit proposals. */
@@ -800,7 +832,12 @@ export async function editClaimField(
   cid: string,
   field: ClaimField,
   text: string,
-): Promise<{ claim: Claim; nearest: NearestPassage[]; write: WriteResult }> {
+): Promise<{
+  claim: Claim;
+  nearest: NearestPassage[];
+  occurrences: Occurrence[];
+  write: WriteResult;
+}> {
   const claims = await loadClaims(env, letter.id);
   const idx = claims.findIndex(c => c.id === cid);
   if (idx < 0) fail(404, 'UNKNOWN_CLAIM', `no claim ${cid} on this letter`);
@@ -808,14 +845,18 @@ export async function editClaimField(
   const before = claims[idx];
   const updated: Claim = { ...before, updated_at: new Date().toISOString() };
   let nearestOut: NearestPassage[] = [];
+  let occurrencesOut: Occurrence[] = [];
+  let unverifiedNote = '';
   if (field === 'quote') {
-    const v = verifyQuote(rule, text);
+    const v = verifyHandQuote(rule, text);
     updated.quote = text;
     updated.anchor_start = v.anchor?.start ?? null;
     updated.anchor_end = v.anchor?.end ?? null;
     updated.page = v.anchor?.page ?? null;
     updated.anchor_status = v.anchor ? 'anchored' : 'unverified';
     nearestOut = v.nearest;
+    occurrencesOut = v.occurrences;
+    unverifiedNote = v.anchor ? '' : ` · ${unverifiedReason(v)}`;
   } else if (field === 'position') {
     updated.position = text as Position;
   } else {
@@ -848,7 +889,7 @@ export async function editClaimField(
         field === 'quote'
           ? updated.anchor_status === 'anchored'
             ? ` · anchored p. ${updated.page}`
-            : ' · UNVERIFIED'
+            : unverifiedNote
           : ''
       }${stale.length ? ` · ${stale.length} pending proposal${stale.length > 1 ? 's' : ''} now stale` : ''}`,
     },
@@ -873,7 +914,7 @@ export async function editClaimField(
       ...staleStmts,
     ],
   });
-  return { claim: updated, nearest: nearestOut, write };
+  return { claim: updated, nearest: nearestOut, occurrences: occurrencesOut, write };
 }
 
 export async function deleteClaim(

@@ -645,6 +645,21 @@ export interface ReadRuleOutput extends ToolOutputBase {
   read_ranges_recorded: number;
 }
 
+/**
+ * The plain-words check on the claimant's own fields (docs/PLAIN-WORDS.md 4). Suggestions only:
+ * nothing here blocks a proposal, and the quote field is never checked.
+ */
+export interface PlainWordsSuggestion {
+  title: string;
+  excerpt: string;
+  fix: string;
+}
+export interface PlainWordsSummary {
+  flags: number;
+  /** The first three flags, so an agent can fix its own draft on the next proposal. */
+  top: PlainWordsSuggestion[];
+}
+
 /** Tool 4 input. */
 export interface ProposeClaimInput {
   base_rev: Rev;
@@ -663,6 +678,7 @@ export interface ProposeClaimOutput extends ToolOutputBase {
   card: { position: Position; assertion: string; requested_change: string };
   needs_human: string;
   pending_count: number;
+  plain_words: PlainWordsSummary;
 }
 
 /** Tool 5 input. */
@@ -695,6 +711,7 @@ export interface DraftMyImpactOutput extends ToolOutputBase {
   for: string;
   preview: string;
   needs_human: string;
+  plain_words: PlainWordsSummary;
 }
 
 /** Tool 7 input. */
@@ -721,6 +738,8 @@ export interface GetLetterOutput extends ToolOutputBase {
     quote_preview: string;
     assertion_preview: string;
     has_requested_change: boolean;
+    /** Flags on this claim's assertion, requested change and evidence (never the quote). */
+    plain_words: { flags: number };
   }>;
   /** '+N more' when claims were truncated to 6. */
   more_claims?: string;
@@ -730,6 +749,8 @@ export interface GetLetterOutput extends ToolOutputBase {
   viewer: { signed_in: boolean; display_name?: string; is_signer: boolean };
   tools_now: ToolName[];
   tools_not_now: Array<{ name: ToolName; reason: string }>;
+  /** PLAIN_WORDS_GUIDE, once per letter (docs/PLAIN-WORDS.md 4). */
+  writing_guide: string;
 }
 
 /** Tool 8 input. */
