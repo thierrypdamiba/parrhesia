@@ -81,6 +81,8 @@ export class WebmcpController {
   private readonly readRanges = new ReadRanges();
   private readonly log = new CallLog();
   private registrySnapshot: RegistrySnapshot | null = null;
+  /** Static hosts register once, so the first registration waits for the page's real state. */
+  private stateReceived = false;
   private busy = false;
   private status: RailStatus = EMPTY_RAIL_STATUS;
   private readonly listeners = new Set<() => void>();
@@ -129,7 +131,11 @@ export class WebmcpController {
     this.unsubscribeLog = this.log.subscribe(() => this.publish());
     this.registrySnapshot = this.registry.snapshot();
     this.detected = true;
-    this.sync();
+    // Nothing is registered against INITIAL_STATE: a static host takes the whole set for the
+    // route at once, and INITIAL_STATE has no rule and no viewer, so it would hand ChatGPT all
+    // eight tools on /r/ with titles that never name the document or the signer. The first sync
+    // waits for setState (which the mounting page always calls) unless state arrived already.
+    if (this.stateReceived) this.sync();
     this.publish();
   }
 
@@ -144,9 +150,11 @@ export class WebmcpController {
 
   /** New page state: re-sync the host set when a gate-relevant field changed. */
   setState(state: PageState): void {
+    const first = !this.stateReceived;
+    this.stateReceived = true;
     this.state = state;
     const key = gateKey(state);
-    if (key === this.key) return;
+    if (key === this.key && !first) return;
     this.key = key;
     this.sync();
     this.publish();

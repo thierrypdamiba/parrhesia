@@ -88,6 +88,17 @@ export class ToolRegistry {
       if (!this.staticDone) {
         this.staticDone = true;
         for (const spec of desired) this.register(spec);
+      } else {
+        // A static host snapshots the set for the route and never diffs it, so the names stay
+        // as registered; but a title or description that only becomes known later (the document
+        // number, the viewer's display name) has to be pushed by re-registering that one tool.
+        for (const spec of desired) {
+          const entry = this.entries.get(spec.name);
+          if (entry && signatureOf(spec) !== entry.signature) {
+            this.unregister(spec.name);
+            this.register(spec);
+          }
+        }
       }
     } else {
       const wanted = new Map(desired.map(s => [s.name, s] as const));
