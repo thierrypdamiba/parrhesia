@@ -2,10 +2,9 @@
 // atomic D1 batch, STALE_REVISION attribution, proposals, claims, signers, undo, checklist,
 // state and export. Routes under app/api/letters are thin wrappers over this module.
 
-import { APP_NAME } from '../lib/app';
 import { locate, nearest } from './anchor';
 import type { DbEnv } from './envvars';
-import { ruleHeader } from './fr';
+import { getCachedRule, ruleHeader } from './fr';
 import { fail } from './http';
 import { randomToken, sanitizeDisplayName, sha256Hex } from './identity';
 import { clockNY, daysLeft, isClosed, todayNY } from './time';
@@ -172,6 +171,14 @@ export async function ownerHash(owner_token: string): Promise<string> {
   return sha256Hex(`owner:${owner_token}`);
 }
 
+/** Owner only (not the share-code path): the creator's cookie hash or user id. */
+export async function isOwner(letter: Letter, viewer: Viewer): Promise<boolean> {
+  if (viewer.user_id && letter.owner_user_id === viewer.user_id) return true;
+  return (
+    !!letter.owner_token_hash && letter.owner_token_hash === (await ownerHash(viewer.owner_token))
+  );
+}
+
 export async function canEditLetter(
   letter: Letter,
   viewer: Viewer,
@@ -214,7 +221,9 @@ export async function loadClaims(env: DbEnv, letter_id: string): Promise<Claim[]
 }
 
 export async function loadSigners(env: DbEnv, letter_id: string): Promise<Signer[]> {
-  const r = await env.DB.prepare('SELECT * FROM signers WHERE letter_id = ? ORDER BY added_at, user_id')
+  const r = await env.DB.prepare(
+    'SELECT * FROM signers WHERE letter_id = ? ORDER BY added_at, user_id',
+  )
     .bind(letter_id)
     .all<Signer>();
   return r.results ?? [];
@@ -260,7 +269,6 @@ export async function loadRevisions(env: DbEnv, letter_id: string): Promise<Revi
 
 export async function loadRule(env: DbEnv, letter: Letter): Promise<RuleCacheParsed | null> {
   if (!letter.document_number) return null;
-  const { getCachedRule } = await import('./fr');
   return getCachedRule(env, letter.document_number);
 }
 
@@ -268,7 +276,7 @@ export async function loadRule(env: DbEnv, letter: Letter): Promise<RuleCachePar
 // STALE_REVISION attribution (4.4)
 // ---------------------------------------------------------------------------
 
-function diffSnapshots(before: Snapshot, after: Snapshot, by: Actor): ChangedSince[] {
+export function diffSnapshots(before: Snapshot, after: Snapshot, by: Actor): ChangedSince[] {
   const out: ChangedSince[] = [];
   const bClaims = new Map(before.claims.map(c => [c.id, c]));
   const aClaims = new Map(after.claims.map(c => [c.id, c]));
@@ -278,42 +286,81 @@ function diffSnapshots(before: Snapshot, after: Snapshot, by: Actor): ChangedSin
       out.push({ claim_id: id, field: 'claim', by, summary: `added claim ${id}` });
       continue;
     }
-    for (const field of ['quote', 'assertion', 'requested_change', 'evidence', 'position'] as const) {
+    for (const field of [
+      'quote',
+      'assertion',
+      'requested_change',
+      'evidence',
+      'position',
+    ] as const) {
       if (prev[field] !== c[field]) {
         out.push({ claim_id: id, field, by, summary: `changed ${field} on claim ${id}` });
       }
     }
   }
   for (const id of bClaims.keys()) {
-    if (!aClaims.has(id)) out.push({ claim_id: id, field: 'claim', by, summary: `deleted claim ${id}` });
+    if (!aClaims.has(id))
+      out.push({ claim_id: id, field: 'claim', by, summary: `deleted claim ${id}` });
   }
   const bSigners = new Map(before.signers.map(s => [s.user_id, s]));
   const aSigners = new Map(after.signers.map(s => [s.user_id, s]));
   for (const [uid, s] of aSigners) {
     const prev = bSigners.get(uid);
     if (!prev) {
-      out.push({ claim_id: null, field: 'signer', by, summary: `${s.display_name} joined as a signer` });
+      out.push({
+        claim_id: null,
+        field: 'signer',
+        by,
+        summary: `${s.display_name} joined as a signer`,
+      });
       continue;
     }
     if (prev.impact_text !== s.impact_text) {
-      out.push({ claim_id: null, field: 'impact', by, summary: `${s.display_name} changed their impact statement` });
+      out.push({
+        claim_id: null,
+        field: 'impact',
+        by,
+        summary: `${s.display_name} changed their impact statement`,
+      });
     }
     if (prev.signed_at !== s.signed_at) {
-      out.push({ claim_id: null, field: 'signature', by, summary: `${s.display_name} ${s.signed_at ? 'signed' : 'unsigned'}` });
+      out.push({
+        claim_id: null,
+        field: 'signature',
+        by,
+        summary: `${s.display_name} ${s.signed_at ? 'signed' : 'unsigned'}`,
+      });
     }
   }
   for (const [uid, s] of bSigners) {
-    if (!aSigners.has(uid)) out.push({ claim_id: null, field: 'signer', by, summary: `${s.display_name} was removed as a signer` });
+    if (!aSigners.has(uid))
+      out.push({
+        claim_id: null,
+        field: 'signer',
+        by,
+        summary: `${s.display_name} was removed as a signer`,
+      });
   }
   return out;
 }
 
 /** What changed between base_rev and the current revision, attributed per intervening revision. */
-export async function changedSince(env: DbEnv, letter: Letter, base_rev: string): Promise<ChangedSince[]> {
+export async function changedSince(
+  env: DbEnv,
+  letter: Letter,
+  base_rev: string,
+): Promise<ChangedSince[]> {
   const revisions = await loadRevisions(env, letter.id);
   const baseIndex = revisions.findIndex(r => r.rev_hash.startsWith(base_rev));
   if (baseIndex < 0) {
-    return [{ claim_id: null, field: 'claim', by: 'human:unknown', summary: `base_rev ${base_rev} is not a revision of this letter` }];
+    return [
+      {
+        claim_id: null,
+        field: 'claim',
+        by: 'human:unknown',
+        summary: `base_rev ${base_rev} is not a revision of this letter`,
+      },
+    ];
   }
   const out: ChangedSince[] = [];
   for (let i = baseIndex + 1; i < revisions.length; i++) {
@@ -324,13 +371,22 @@ export async function changedSince(env: DbEnv, letter: Letter, base_rev: string)
   return out.slice(0, 20);
 }
 
-export async function assertBaseRev(env: DbEnv, letter: Letter, base_rev: unknown): Promise<string> {
+export async function assertBaseRev(
+  env: DbEnv,
+  letter: Letter,
+  base_rev: unknown,
+): Promise<string> {
   if (!isRev(base_rev)) fail(400, 'INVALID', 'base_rev: 12 hex chars from get_letter');
   if (!letter.rev_hash.startsWith(base_rev)) {
-    fail(409, 'STALE_REVISION', `letter is at ${shortRev(letter.rev_hash)} (rev ${letter.rev_no}); re-read and retry`, {
-      current_rev: shortRev(letter.rev_hash),
-      changed_since: await changedSince(env, letter, base_rev),
-    });
+    fail(
+      409,
+      'STALE_REVISION',
+      `letter is at ${shortRev(letter.rev_hash)} (rev ${letter.rev_no}); re-read and retry`,
+      {
+        current_rev: shortRev(letter.rev_hash),
+        changed_since: await changedSince(env, letter, base_rev),
+      },
+    );
   }
   return base_rev;
 }
@@ -378,7 +434,12 @@ export async function writeRevision(env: DbEnv, input: WriteInput): Promise<Writ
   const rev_no = letter.rev_no + 1;
   const now = new Date().toISOString();
   const extraCols = Object.entries(input.letterColumns ?? {});
-  const setClause = ['rev_no = ?', 'rev_hash = ?', 'updated_at = ?', ...extraCols.map(([k]) => `${k} = ?`)].join(', ');
+  const setClause = [
+    'rev_no = ?',
+    'rev_hash = ?',
+    'updated_at = ?',
+    ...extraCols.map(([k]) => `${k} = ?`),
+  ].join(', ');
   const statements: D1PreparedStatement[] = [
     env.DB.prepare(
       'INSERT INTO revisions (letter_id, rev_no, rev_hash, snapshot_json, actor, action, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -392,13 +453,9 @@ export async function writeRevision(env: DbEnv, input: WriteInput): Promise<Writ
       letter.rev_no,
     ),
     ...input.statements,
-    env.DB.prepare('INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)').bind(
-      letter.id,
-      input.actor,
-      input.activity.kind,
-      input.activity.summary.slice(0, 200),
-      now,
-    ),
+    env.DB.prepare(
+      'INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)',
+    ).bind(letter.id, input.actor, input.activity.kind, input.activity.summary.slice(0, 200), now),
   ];
   try {
     await env.DB.batch(statements);
@@ -406,10 +463,15 @@ export async function writeRevision(env: DbEnv, input: WriteInput): Promise<Writ
     const msg = err instanceof Error ? err.message : String(err);
     if (/UNIQUE|constraint|PRIMARY KEY/i.test(msg)) {
       const fresh = await loadLetter(env, letter.id);
-      fail(409, 'STALE_REVISION', `another change landed first; letter is now at ${shortRev(fresh.rev_hash)}`, {
-        current_rev: shortRev(fresh.rev_hash),
-        changed_since: await changedSince(env, fresh, shortRev(letter.rev_hash)),
-      });
+      fail(
+        409,
+        'STALE_REVISION',
+        `another change landed first; letter is now at ${shortRev(fresh.rev_hash)}`,
+        {
+          current_rev: shortRev(fresh.rev_hash),
+          changed_since: await changedSince(env, fresh, shortRev(letter.rev_hash)),
+        },
+      );
     }
     throw err;
   }
@@ -417,8 +479,16 @@ export async function writeRevision(env: DbEnv, input: WriteInput): Promise<Writ
 }
 
 /** Activity-only write (reads, refusals): no revision. */
-export async function logActivity(env: DbEnv, letter_id: string, actor: Actor, kind: string, summary: string) {
-  await env.DB.prepare('INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)')
+export async function logActivity(
+  env: DbEnv,
+  letter_id: string,
+  actor: Actor,
+  kind: string,
+  summary: string,
+) {
+  await env.DB.prepare(
+    'INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)',
+  )
     .bind(letter_id, actor, kind, summary.slice(0, 200), new Date().toISOString())
     .run();
 }
@@ -431,24 +501,27 @@ export async function createLetter(
   env: DbEnv,
   viewer: Viewer,
   actor: Actor,
-  opts: { is_judge_copy?: boolean } = {},
+  opts: { is_judge_copy?: boolean; rule?: RuleCacheParsed | null } = {},
 ): Promise<Letter> {
   const now = new Date().toISOString();
+  // With a rule, the letter is born bound at rev_no 1 (POST /api/letters {document_number}).
+  const header = opts.rule ? ruleHeader(opts.rule) : null;
+  const snapshot = buildSnapshot(header?.document_number ?? null, [], []);
   const letter: Letter = {
     id: newId('l_'),
-    document_number: null,
-    title: null,
-    agency: null,
-    agency_slug: null,
-    docket_id: null,
-    regs_document_id: null,
-    comment_url: null,
-    html_url: null,
-    publication_date: null,
-    comments_close_on: null,
-    rule_sha256: null,
+    document_number: header?.document_number ?? null,
+    title: header?.title ?? null,
+    agency: header?.agency ?? null,
+    agency_slug: header?.agency_slug ?? null,
+    docket_id: header?.docket_id ?? null,
+    regs_document_id: header?.document_id ?? null,
+    comment_url: header?.comment_url ?? null,
+    html_url: header?.html_url ?? null,
+    publication_date: header?.publication_date ?? null,
+    comments_close_on: header?.comments_close_on ?? null,
+    rule_sha256: opts.rule?.text_sha256 ?? null,
     rev_no: 1,
-    rev_hash: await hashSnapshot(buildSnapshot(null, [], [])),
+    rev_hash: await hashSnapshot(snapshot),
     owner_user_id: viewer.user_id,
     owner_token_hash: await ownerHash(viewer.owner_token),
     share_code: newLinkToken(),
@@ -460,9 +533,20 @@ export async function createLetter(
   await env.DB.batch([
     env.DB.prepare(
       `INSERT INTO letters (id, document_number, title, agency, agency_slug, docket_id, regs_document_id, comment_url, html_url, publication_date, comments_close_on, rule_sha256, rev_no, rev_hash, owner_user_id, owner_token_hash, share_code, public_token, is_judge_copy, created_at, updated_at)
-       VALUES (?, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?)`,
     ).bind(
       letter.id,
+      letter.document_number,
+      letter.title,
+      letter.agency,
+      letter.agency_slug,
+      letter.docket_id,
+      letter.regs_document_id,
+      letter.comment_url,
+      letter.html_url,
+      letter.publication_date,
+      letter.comments_close_on,
+      letter.rule_sha256,
       letter.rev_hash,
       letter.owner_user_id,
       letter.owner_token_hash,
@@ -474,12 +558,25 @@ export async function createLetter(
     ),
     env.DB.prepare(
       'INSERT INTO revisions (letter_id, rev_no, rev_hash, snapshot_json, actor, action, created_at) VALUES (?, 1, ?, ?, ?, ?, ?)',
-    ).bind(letter.id, letter.rev_hash, canonicalJson(buildSnapshot(null, [], [])), actor, 'create', now),
-    env.DB.prepare('INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)').bind(
+    ).bind(
+      letter.id,
+      letter.rev_hash,
+      canonicalJson(snapshot),
+      actor,
+      header ? `create bound to ${header.document_number}` : 'create',
+      now,
+    ),
+    env.DB.prepare(
+      'INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)',
+    ).bind(
       letter.id,
       actor,
       'create',
-      opts.is_judge_copy ? 'Judge letter forked from the shipped seed' : 'Letter created',
+      opts.is_judge_copy
+        ? 'Judge letter forked from the shipped seed'
+        : header
+          ? `${actorLabel(actor)} started a letter on ${header.document_number} (${header.title})`
+          : 'Letter created',
       now,
     ),
   ]);
@@ -487,9 +584,16 @@ export async function createLetter(
 }
 
 /** Bind a rule (rules_cache row) to an unbound letter: a new revision with the header columns. */
-export async function bindRule(env: DbEnv, letter: Letter, rule: RuleCacheParsed, actor: Actor): Promise<WriteResult> {
+export async function bindRule(
+  env: DbEnv,
+  letter: Letter,
+  rule: RuleCacheParsed,
+  actor: Actor,
+): Promise<WriteResult> {
   if (letter.document_number) {
-    fail(409, 'ALREADY_BOUND', `letter is bound to ${letter.document_number}`, { document_number: letter.document_number });
+    fail(409, 'ALREADY_BOUND', `letter is bound to ${letter.document_number}`, {
+      document_number: letter.document_number,
+    });
   }
   const header = ruleHeader(rule);
   const claims = await loadClaims(env, letter.id);
@@ -498,7 +602,10 @@ export async function bindRule(env: DbEnv, letter: Letter, rule: RuleCacheParsed
     letter,
     actor,
     action: `bind ${rule.document_number}`,
-    activity: { kind: 'bind', summary: `${actorLabel(actor)} attached ${rule.document_number} (${header.title})` },
+    activity: {
+      kind: 'bind',
+      summary: `${actorLabel(actor)} attached ${rule.document_number} (${header.title})`,
+    },
     claims,
     signers,
     statements: [],
@@ -537,14 +644,24 @@ export function verifyQuote(rule: RuleCacheParsed, quote: string): Verdict {
 export function requireAnchor(rule: RuleCacheParsed, quote: string): Anchor {
   const v = verifyQuote(rule, quote);
   if (!v.anchor) {
-    fail(422, 'ANCHOR_NOT_FOUND', 'the quote is not in the rule text; copy one of the nearest passages verbatim', {
-      nearest: v.nearest,
-    });
+    fail(
+      422,
+      'ANCHOR_NOT_FOUND',
+      'the quote is not in the rule text; copy one of the nearest passages verbatim',
+      {
+        nearest: v.nearest,
+      },
+    );
   }
   if (!v.anchor.unique) {
-    fail(422, 'ANCHOR_AMBIGUOUS', `the quote occurs ${v.anchor.occurrences.length} times; quote a longer span`, {
-      occurrences: v.anchor.occurrences,
-    });
+    fail(
+      422,
+      'ANCHOR_AMBIGUOUS',
+      `the quote occurs ${v.anchor.occurrences.length} times; quote a longer span`,
+      {
+        occurrences: v.anchor.occurrences,
+      },
+    );
   }
   return v.anchor;
 }
@@ -558,7 +675,8 @@ export function requireOpen(letter: Letter): void {
 }
 
 export function requireRule(letter: Letter, rule: RuleCacheParsed | null): RuleCacheParsed {
-  if (!letter.document_number || !rule) fail(404, 'NO_RULE', 'no rule is attached to this letter; call open_rule first');
+  if (!letter.document_number || !rule)
+    fail(404, 'NO_RULE', 'no rule is attached to this letter; call open_rule first');
   return rule;
 }
 
@@ -566,7 +684,11 @@ export function requireHold(hold_ms: unknown): number {
   const n = typeof hold_ms === 'number' ? hold_ms : Number(hold_ms);
   // A consistency check for the held gesture, not a security boundary (4.4).
   if (!Number.isFinite(n) || n < LIMITS.hold_ms) {
-    fail(400, 'HOLD_REQUIRED', `accepting needs a held gesture of at least ${LIMITS.hold_ms} ms (got ${Number.isFinite(n) ? n : 'none'})`);
+    fail(
+      400,
+      'HOLD_REQUIRED',
+      `accepting needs a held gesture of at least ${LIMITS.hold_ms} ms (got ${Number.isFinite(n) ? n : 'none'})`,
+    );
   }
   return n;
 }
@@ -583,7 +705,14 @@ export interface ClaimInput {
   evidence: string;
 }
 
-function claimRow(letter_id: string, ord: number, input: ClaimInput, anchor: Anchor | null, proposed_by: Actor | null, accepted_by: Actor | null): Claim {
+function claimRow(
+  letter_id: string,
+  ord: number,
+  input: ClaimInput,
+  anchor: Anchor | null,
+  proposed_by: Actor | null,
+  accepted_by: Actor | null,
+): Claim {
   const now = new Date().toISOString();
   return {
     id: newId('c_'),
@@ -640,7 +769,8 @@ export async function addClaimByHand(
   input: ClaimInput,
 ): Promise<{ claim: Claim; nearest: NearestPassage[]; write: WriteResult }> {
   const claims = await loadClaims(env, letter.id);
-  if (claims.length >= LIMITS.claims_per_letter) fail(409, 'LIMIT', `a letter holds at most ${LIMITS.claims_per_letter} claims`);
+  if (claims.length >= LIMITS.claims_per_letter)
+    fail(409, 'LIMIT', `a letter holds at most ${LIMITS.claims_per_letter} claims`);
   const signers = await loadSigners(env, letter.id);
   const v = verifyQuote(rule, input.quote);
   const anchor = v.anchor && v.anchor.unique ? v.anchor : v.anchor ? { ...v.anchor } : null;
@@ -702,7 +832,11 @@ export async function editClaimField(
   const staleStmts = stale.map(p => {
     const payload = JSON.parse(p.payload_json) as EditProposalPayload & { stale?: unknown };
     payload.stale = { field, by: actor, at: now };
-    return env.DB.prepare('UPDATE proposals SET status = ?, payload_json = ? WHERE id = ?').bind('stale', JSON.stringify(payload), p.id);
+    return env.DB.prepare('UPDATE proposals SET status = ?, payload_json = ? WHERE id = ?').bind(
+      'stale',
+      JSON.stringify(payload),
+      p.id,
+    );
   });
   const write = await writeRevision(env, {
     letter,
@@ -711,7 +845,11 @@ export async function editClaimField(
     activity: {
       kind: 'edit',
       summary: `${actorLabel(actor)} changed ${field.replace('_', ' ')} on claim ${n}${
-        field === 'quote' ? (updated.anchor_status === 'anchored' ? ` · anchored p. ${updated.page}` : ' · UNVERIFIED') : ''
+        field === 'quote'
+          ? updated.anchor_status === 'anchored'
+            ? ` · anchored p. ${updated.page}`
+            : ' · UNVERIFIED'
+          : ''
       }${stale.length ? ` · ${stale.length} pending proposal${stale.length > 1 ? 's' : ''} now stale` : ''}`,
     },
     claims: next,
@@ -738,7 +876,12 @@ export async function editClaimField(
   return { claim: updated, nearest: nearestOut, write };
 }
 
-export async function deleteClaim(env: DbEnv, letter: Letter, actor: Actor, cid: string): Promise<WriteResult> {
+export async function deleteClaim(
+  env: DbEnv,
+  letter: Letter,
+  actor: Actor,
+  cid: string,
+): Promise<WriteResult> {
   const claims = await loadClaims(env, letter.id);
   const idx = claims.findIndex(c => c.id === cid);
   if (idx < 0) fail(404, 'UNKNOWN_CLAIM', `no claim ${cid} on this letter`);
@@ -753,7 +896,9 @@ export async function deleteClaim(env: DbEnv, letter: Letter, actor: Actor, cid:
     signers,
     statements: [
       env.DB.prepare('DELETE FROM claims WHERE id = ?').bind(cid),
-      env.DB.prepare("UPDATE proposals SET status = 'stale' WHERE letter_id = ? AND claim_id = ? AND status = 'pending'").bind(letter.id, cid),
+      env.DB.prepare(
+        "UPDATE proposals SET status = 'stale' WHERE letter_id = ? AND claim_id = ? AND status = 'pending'",
+      ).bind(letter.id, cid),
     ],
   });
 }
@@ -787,7 +932,11 @@ export async function createProposal(
   requireOpen(letter);
   const pending = await loadProposals(env, letter.id, ['pending']);
   if (pending.length >= LIMITS.pending_per_letter) {
-    fail(429, 'PENDING_LIMIT', `${pending.length} proposals are waiting for a person; ask them to accept or reject first`);
+    fail(
+      429,
+      'PENDING_LIMIT',
+      `${pending.length} proposals are waiting for a person; ask them to accept or reject first`,
+    );
   }
   const claims = await loadClaims(env, letter.id);
   const now = new Date().toISOString();
@@ -800,7 +949,8 @@ export async function createProposal(
   let summary: string;
 
   if (input.kind === 'claim') {
-    if (claims.length >= LIMITS.claims_per_letter) fail(409, 'LIMIT', `a letter holds at most ${LIMITS.claims_per_letter} claims`);
+    if (claims.length >= LIMITS.claims_per_letter)
+      fail(409, 'LIMIT', `a letter holds at most ${LIMITS.claims_per_letter} claims`);
     anchor = requireAnchor(rule, input.input.quote);
     payload = { ...input.input, anchor };
     summary = `${actorLabel(actor)} proposed a ${input.input.position} claim · anchored p. ${anchor.page} · ${anchor.start}–${anchor.end} (against ${base_rev})`;
@@ -820,12 +970,25 @@ export async function createProposal(
     summary = `${actorLabel(actor)} proposed an edit to ${field.replace('_', ' ')} on claim ${claims.indexOf(claim) + 1} (against ${base_rev})`;
   } else {
     if (!viewer.signed_in || !viewer.user_id) {
-      fail(401, 'NOT_SIGNED_IN', 'sign in with ChatGPT; an impact statement can be drafted only for the signed-in person');
+      fail(
+        401,
+        'NOT_SIGNED_IN',
+        'sign in with ChatGPT; an impact statement can be drafted only for the signed-in person',
+      );
     }
-    const already = pending.find(p => p.kind === 'impact' && p.proposed_for_user_id === viewer.user_id);
-    if (already) fail(409, 'ALREADY_PENDING', `${viewer.display_name} already has a pending impact draft (${already.id})`);
+    const already = pending.find(
+      p => p.kind === 'impact' && p.proposed_for_user_id === viewer.user_id,
+    );
+    if (already)
+      fail(
+        409,
+        'ALREADY_PENDING',
+        `${viewer.display_name} already has a pending impact draft (${already.id})`,
+      );
     proposed_for_user_id = viewer.user_id;
-    payload = { text: input.text };
+    // The display name rides in payload_json (never in the API body) so the 403 hint and the
+    // state card can name the person without exposing a user id; toPending strips it.
+    payload = { text: input.text, for_display_name: viewer.display_name } as ImpactProposalPayload;
     summary = `${actorLabel(actor)} drafted an impact statement for ${viewer.display_name} (against ${base_rev})`;
   }
 
@@ -862,13 +1025,9 @@ export async function createProposal(
       proposal.proposed_for_user_id,
       proposal.created_at,
     ),
-    env.DB.prepare('INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)').bind(
-      letter.id,
-      actor,
-      'proposal',
-      summary.slice(0, 200),
-      now,
-    ),
+    env.DB.prepare(
+      'INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)',
+    ).bind(letter.id, actor, 'proposal', summary.slice(0, 200), now),
   ]);
   return { proposal, payload, diff, anchor, pending_count: pending.length + 1 };
 }
@@ -905,8 +1064,12 @@ export async function decideProposal(
 
   if (decision === 'reject') {
     await env.DB.batch([
-      env.DB.prepare("UPDATE proposals SET status = 'rejected', decided_by = ?, decided_at = ? WHERE id = ?").bind(actor, now, pid),
-      env.DB.prepare('INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)').bind(
+      env.DB.prepare(
+        "UPDATE proposals SET status = 'rejected', decided_by = ?, decided_at = ? WHERE id = ?",
+      ).bind(actor, now, pid),
+      env.DB.prepare(
+        'INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)',
+      ).bind(
         letter.id,
         actor,
         'reject',
@@ -918,16 +1081,31 @@ export async function decideProposal(
   }
 
   if (proposal.kind === 'impact' && proposal.proposed_for_user_id !== viewer.user_id) {
-    const who = signers.find(s => s.user_id === proposal.proposed_for_user_id)?.display_name ?? 'the person it is for';
+    const forName = (JSON.parse(proposal.payload_json) as { for_display_name?: string })
+      .for_display_name;
+    const who =
+      signers.find(s => s.user_id === proposal.proposed_for_user_id)?.display_name ??
+      forName ??
+      'the person it is for';
     fail(403, 'FORBIDDEN', `Only ${who} can accept this`);
   }
   requireOpen(letter);
-  const decided = env.DB.prepare("UPDATE proposals SET status = 'accepted', decided_by = ?, decided_at = ? WHERE id = ?").bind(actor, now, pid);
+  const decided = env.DB.prepare(
+    "UPDATE proposals SET status = 'accepted', decided_by = ?, decided_at = ? WHERE id = ?",
+  ).bind(actor, now, pid);
 
   if (proposal.kind === 'claim') {
-    if (claims.length >= LIMITS.claims_per_letter) fail(409, 'LIMIT', `a letter holds at most ${LIMITS.claims_per_letter} claims`);
+    if (claims.length >= LIMITS.claims_per_letter)
+      fail(409, 'LIMIT', `a letter holds at most ${LIMITS.claims_per_letter} claims`);
     const payload = JSON.parse(proposal.payload_json) as ClaimProposalPayload;
-    const claim = claimRow(letter.id, (claims.at(-1)?.ord ?? 0) + 1, payload, payload.anchor, proposal.proposed_by, actor);
+    const claim = claimRow(
+      letter.id,
+      (claims.at(-1)?.ord ?? 0) + 1,
+      payload,
+      payload.anchor,
+      proposal.proposed_by,
+      actor,
+    );
     const write = await writeRevision(env, {
       letter,
       actor,
@@ -944,17 +1122,24 @@ export async function decideProposal(
   }
 
   if (proposal.kind === 'edit') {
-    const payload = JSON.parse(proposal.payload_json) as EditProposalPayload & { stale?: { by: Actor } };
+    const payload = JSON.parse(proposal.payload_json) as EditProposalPayload & {
+      stale?: { by: Actor };
+    };
     if (claimIndex < 0) fail(404, 'UNKNOWN_CLAIM', `claim ${proposal.claim_id} no longer exists`);
     const claim = claims[claimIndex];
     const field = payload.field;
     const current = claim[field];
     if (current !== payload.was || proposal.status === 'stale') {
       const changes = await changedSince(env, letter, proposal.base_rev);
-      const by = changes.find(c => c.claim_id === claim.id && c.field === field)?.by ?? payload.stale?.by ?? 'human:unknown';
+      const by =
+        changes.find(c => c.claim_id === claim.id && c.field === field)?.by ??
+        payload.stale?.by ??
+        'human:unknown';
       await env.DB.batch([
         env.DB.prepare("UPDATE proposals SET status = 'stale' WHERE id = ?").bind(pid),
-        env.DB.prepare('INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)').bind(
+        env.DB.prepare(
+          'INSERT INTO activity (letter_id, actor, kind, summary, created_at) VALUES (?, ?, ?, ?, ?)',
+        ).bind(
           letter.id,
           actor,
           'stale',
@@ -962,12 +1147,17 @@ export async function decideProposal(
           now,
         ),
       ]);
-      fail(409, 'STALE_PROPOSAL', `${actorLabel(by)} changed ${field} on claim ${claimIndex + 1} after this was proposed`, {
-        field,
-        was: payload.was,
-        now: current,
-        by,
-      });
+      fail(
+        409,
+        'STALE_PROPOSAL',
+        `${actorLabel(by)} changed ${field} on claim ${claimIndex + 1} after this was proposed`,
+        {
+          field,
+          was: payload.was,
+          now: current,
+          by,
+        },
+      );
     }
     const updated: Claim = { ...claim, updated_at: now };
     if (field === 'quote') {
@@ -1021,26 +1211,37 @@ export async function decideProposal(
   const existing = signers.find(s => s.user_id === uid);
   const signer: Signer = existing
     ? { ...existing, impact_text: payload.text }
-    : { letter_id: letter.id, user_id: uid, display_name: viewer.display_name, impact_text: payload.text, signed_at: null, added_at: now };
-  if (!existing && signers.length >= LIMITS.signers_per_letter) fail(409, 'SIGNER_LIMIT', `a letter holds at most ${LIMITS.signers_per_letter} signers`);
-  const nextSigners = existing ? signers.map(s => (s.user_id === uid ? signer : s)) : [...signers, signer];
+    : {
+        letter_id: letter.id,
+        user_id: uid,
+        display_name: viewer.display_name,
+        impact_text: payload.text,
+        signed_at: null,
+        added_at: now,
+      };
+  if (!existing && signers.length >= LIMITS.signers_per_letter)
+    fail(409, 'SIGNER_LIMIT', `a letter holds at most ${LIMITS.signers_per_letter} signers`);
+  const nextSigners = existing
+    ? signers.map(s => (s.user_id === uid ? signer : s))
+    : [...signers, signer];
   const write = await writeRevision(env, {
     letter,
     actor,
     action: `accept impact ${uid.slice(0, 8)}`,
-    activity: { kind: 'accept', summary: `${signer.display_name} accepted the impact statement drafted by ${actorLabel(proposal.proposed_by)}` },
+    activity: {
+      kind: 'accept',
+      summary: `${signer.display_name} accepted the impact statement drafted by ${actorLabel(proposal.proposed_by)}`,
+    },
     claims,
     signers: nextSigners,
     statements: [
       existing
-        ? env.DB.prepare('UPDATE signers SET impact_text = ? WHERE letter_id = ? AND user_id = ?').bind(payload.text, letter.id, uid)
-        : env.DB.prepare('INSERT INTO signers (letter_id, user_id, display_name, impact_text, signed_at, added_at) VALUES (?, ?, ?, ?, NULL, ?)').bind(
-            letter.id,
-            uid,
-            signer.display_name,
-            payload.text,
-            now,
-          ),
+        ? env.DB.prepare(
+            'UPDATE signers SET impact_text = ? WHERE letter_id = ? AND user_id = ?',
+          ).bind(payload.text, letter.id, uid)
+        : env.DB.prepare(
+            'INSERT INTO signers (letter_id, user_id, display_name, impact_text, signed_at, added_at) VALUES (?, ?, ?, ?, NULL, ?)',
+          ).bind(letter.id, uid, signer.display_name, payload.text, now),
       decided,
     ],
   });
@@ -1052,18 +1253,33 @@ export async function decideProposal(
 // ---------------------------------------------------------------------------
 
 export function requireSignedIn(viewer: Viewer): string {
-  if (!viewer.signed_in || !viewer.user_id) fail(401, 'NOT_SIGNED_IN', 'sign in with ChatGPT to sign on');
+  if (!viewer.signed_in || !viewer.user_id)
+    fail(401, 'NOT_SIGNED_IN', 'sign in with ChatGPT to sign on');
   return viewer.user_id;
 }
 
-export async function addSelfAsSigner(env: DbEnv, letter: Letter, viewer: Viewer, actor: Actor): Promise<WriteResult> {
+export async function addSelfAsSigner(
+  env: DbEnv,
+  letter: Letter,
+  viewer: Viewer,
+  actor: Actor,
+): Promise<WriteResult> {
   const uid = requireSignedIn(viewer);
   const claims = await loadClaims(env, letter.id);
   const signers = await loadSigners(env, letter.id);
-  if (signers.some(s => s.user_id === uid)) fail(409, 'ALREADY_SIGNER', `${viewer.display_name} is already a signer`);
-  if (signers.length >= LIMITS.signers_per_letter) fail(409, 'SIGNER_LIMIT', `a letter holds at most ${LIMITS.signers_per_letter} signers`);
+  if (signers.some(s => s.user_id === uid))
+    fail(409, 'ALREADY_SIGNER', `${viewer.display_name} is already a signer`);
+  if (signers.length >= LIMITS.signers_per_letter)
+    fail(409, 'SIGNER_LIMIT', `a letter holds at most ${LIMITS.signers_per_letter} signers`);
   const now = new Date().toISOString();
-  const signer: Signer = { letter_id: letter.id, user_id: uid, display_name: viewer.display_name, impact_text: null, signed_at: null, added_at: now };
+  const signer: Signer = {
+    letter_id: letter.id,
+    user_id: uid,
+    display_name: viewer.display_name,
+    impact_text: null,
+    signed_at: null,
+    added_at: now,
+  };
   return writeRevision(env, {
     letter,
     actor,
@@ -1072,12 +1288,9 @@ export async function addSelfAsSigner(env: DbEnv, letter: Letter, viewer: Viewer
     claims,
     signers: [...signers, signer],
     statements: [
-      env.DB.prepare('INSERT INTO signers (letter_id, user_id, display_name, impact_text, signed_at, added_at) VALUES (?, ?, ?, NULL, NULL, ?)').bind(
-        letter.id,
-        uid,
-        viewer.display_name,
-        now,
-      ),
+      env.DB.prepare(
+        'INSERT INTO signers (letter_id, user_id, display_name, impact_text, signed_at, added_at) VALUES (?, ?, ?, NULL, NULL, ?)',
+      ).bind(letter.id, uid, viewer.display_name, now),
     ],
   });
 }
@@ -1103,7 +1316,12 @@ export async function updateSelfSigner(
       activity: { kind: 'signer', summary: `${me.display_name} removed themselves as a signer` },
       claims,
       signers: signers.filter(s => s.user_id !== uid),
-      statements: [env.DB.prepare('DELETE FROM signers WHERE letter_id = ? AND user_id = ?').bind(letter.id, uid)],
+      statements: [
+        env.DB.prepare('DELETE FROM signers WHERE letter_id = ? AND user_id = ?').bind(
+          letter.id,
+          uid,
+        ),
+      ],
     });
   }
   const updated: Signer = { ...me };
@@ -1120,7 +1338,8 @@ export async function updateSelfSigner(
     summary = `A signer set their public display name to ${updated.display_name}`;
   }
   if (change.sign) {
-    if (me.display_name === 'Signer') fail(400, 'INVALID', 'display_name: set your public display name before signing');
+    if (me.display_name === 'Signer')
+      fail(400, 'INVALID', 'display_name: set your public display name before signing');
     updated.signed_at = now;
     action = `sign ${uid.slice(0, 8)}`;
     summary = `${me.display_name} signed the letter`;
@@ -1133,12 +1352,38 @@ export async function updateSelfSigner(
     claims,
     signers: signers.map(s => (s.user_id === uid ? updated : s)),
     statements: [
-      env.DB.prepare('UPDATE signers SET display_name = ?, impact_text = ?, signed_at = ? WHERE letter_id = ? AND user_id = ?').bind(
-        updated.display_name,
-        updated.impact_text,
-        updated.signed_at,
+      env.DB.prepare(
+        'UPDATE signers SET display_name = ?, impact_text = ?, signed_at = ? WHERE letter_id = ? AND user_id = ?',
+      ).bind(updated.display_name, updated.impact_text, updated.signed_at, letter.id, uid),
+    ],
+  });
+}
+
+/** Owner removes a signer (P8). */
+export async function removeSigner(
+  env: DbEnv,
+  letter: Letter,
+  actor: Actor,
+  user_id: string,
+): Promise<WriteResult> {
+  const claims = await loadClaims(env, letter.id);
+  const signers = await loadSigners(env, letter.id);
+  const gone = signers.find(s => s.user_id === user_id);
+  if (!gone) fail(404, 'NOT_SIGNER', 'no such signer on this letter');
+  return writeRevision(env, {
+    letter,
+    actor,
+    action: `remove signer ${user_id.slice(0, 8)}`,
+    activity: {
+      kind: 'signer',
+      summary: `${actorLabel(actor)} removed ${gone.display_name} as a signer`,
+    },
+    claims,
+    signers: signers.filter(s => s.user_id !== user_id),
+    statements: [
+      env.DB.prepare('DELETE FROM signers WHERE letter_id = ? AND user_id = ?').bind(
         letter.id,
-        uid,
+        user_id,
       ),
     ],
   });
@@ -1162,7 +1407,13 @@ export async function undoLast(env: DbEnv, letter: Letter, actor: Actor): Promis
   const restoredClaims: Claim[] = snapshot.claims.map(sc => {
     const c = byId.get(sc.id);
     return {
-      ...(c ?? { letter_id: letter.id, proposed_by: null, accepted_by: null, accepted_at: null, created_at: now }),
+      ...(c ?? {
+        letter_id: letter.id,
+        proposed_by: null,
+        accepted_by: null,
+        accepted_at: null,
+        created_at: now,
+      }),
       ...sc,
       letter_id: letter.id,
       updated_at: now,
@@ -1179,21 +1430,19 @@ export async function undoLast(env: DbEnv, letter: Letter, actor: Actor): Promis
     ...restoredClaims.map(c => insertClaimStmt(env, c)),
     env.DB.prepare('DELETE FROM signers WHERE letter_id = ?').bind(letter.id),
     ...restoredSigners.map(s =>
-      env.DB.prepare('INSERT INTO signers (letter_id, user_id, display_name, impact_text, signed_at, added_at) VALUES (?, ?, ?, ?, ?, ?)').bind(
-        s.letter_id,
-        s.user_id,
-        s.display_name,
-        s.impact_text,
-        s.signed_at,
-        s.added_at,
-      ),
+      env.DB.prepare(
+        'INSERT INTO signers (letter_id, user_id, display_name, impact_text, signed_at, added_at) VALUES (?, ?, ?, ?, ?, ?)',
+      ).bind(s.letter_id, s.user_id, s.display_name, s.impact_text, s.signed_at, s.added_at),
     ),
   ];
   return writeRevision(env, {
     letter,
     actor,
     action: `undo to rev ${prev.rev_no}`,
-    activity: { kind: 'undo', summary: `${actorLabel(actor)} undid the last change (restored rev ${prev.rev_no} as rev ${letter.rev_no + 1})` },
+    activity: {
+      kind: 'undo',
+      summary: `${actorLabel(actor)} undid the last change (restored rev ${prev.rev_no} as rev ${letter.rev_no + 1})`,
+    },
     claims: restoredClaims,
     signers: restoredSigners,
     statements,
@@ -1202,26 +1451,46 @@ export async function undoLast(env: DbEnv, letter: Letter, actor: Actor): Promis
 }
 
 // ---------------------------------------------------------------------------
-// Checklist, state, export
+// Checklist and state (export lives in server/export.ts)
 // ---------------------------------------------------------------------------
 
-export function computeMissing(letter: Letter, claims: readonly Claim[], signers: readonly Signer[]): string[] {
+export function computeMissing(
+  letter: Letter,
+  claims: readonly Claim[],
+  signers: readonly Signer[],
+): string[] {
   const missing: string[] = [];
   if (!letter.document_number) missing.push('attach a rule');
   if (claims.length === 0) missing.push('at least one claim');
   claims.forEach((c, i) => {
-    if (c.anchor_status !== 'anchored') missing.push(`claim ${i + 1} quote is not in the rule text`);
+    if (c.anchor_status !== 'anchored')
+      missing.push(`claim ${i + 1} quote is not in the rule text`);
     if (!c.requested_change.trim()) missing.push(`claim ${i + 1} has no requested change`);
   });
   if (signers.length === 0) missing.push('no signer yet (optional: sign in and add yourself)');
   for (const s of signers) if (!s.signed_at) missing.push(`${s.display_name} has not signed`);
-  if (isClosed(letter.comments_close_on)) missing.push(`comment period closed ${letter.comments_close_on}`);
+  if (isClosed(letter.comments_close_on))
+    missing.push(`comment period closed ${letter.comments_close_on}`);
   return missing;
 }
 
+/** Signers as the API returns them: no user ids, only the viewer's own membership flag. */
+export function stateSigners(signers: readonly Signer[], viewer: Viewer): StateSigner[] {
+  return signers.map<StateSigner>(s => ({
+    display_name: s.display_name,
+    impact_text: s.impact_text,
+    signed_at: s.signed_at,
+    added_at: s.added_at,
+    is_viewer: s.user_id === viewer.user_id,
+  }));
+}
+
 export function toPending(p: Proposal, signers: readonly Signer[]): PendingProposal {
-  const payload = JSON.parse(p.payload_json) as PendingProposal['payload'] & { stale?: PendingProposal['stale'] };
-  const { stale, ...rest } = payload;
+  const payload = JSON.parse(p.payload_json) as PendingProposal['payload'] & {
+    stale?: PendingProposal['stale'];
+    for_display_name?: string;
+  };
+  const { stale, for_display_name, ...rest } = payload;
   const out: PendingProposal = {
     proposal_id: p.id,
     kind: p.kind,
@@ -1233,10 +1502,18 @@ export function toPending(p: Proposal, signers: readonly Signer[]): PendingPropo
     by: p.proposed_by,
     proposed_for_user_id: null,
     created_at: p.created_at,
-    stale: p.status === 'stale' ? (stale ?? { field: (p.field ?? 'assertion') as ClaimField, by: 'human:unknown', at: p.created_at }) : null,
+    stale:
+      p.status === 'stale'
+        ? (stale ?? {
+            field: (p.field ?? 'assertion') as ClaimField,
+            by: 'human:unknown',
+            at: p.created_at,
+          })
+        : null,
   };
   if (p.kind === 'impact') {
-    out.for_display_name = signers.find(s => s.user_id === p.proposed_for_user_id)?.display_name;
+    out.for_display_name =
+      signers.find(s => s.user_id === p.proposed_for_user_id)?.display_name ?? for_display_name;
   }
   return out;
 }
@@ -1256,8 +1533,10 @@ export async function buildState(
   ]);
   const pending = proposals.map(p => {
     const pp = toPending(p, signers);
-    if (p.kind === 'impact' && p.proposed_for_user_id === viewer.user_id) pp.proposed_for_user_id = 'me';
-    if (p.kind === 'impact' && !pp.for_display_name && p.proposed_for_user_id === viewer.user_id) pp.for_display_name = viewer.display_name;
+    if (p.kind === 'impact' && p.proposed_for_user_id === viewer.user_id)
+      pp.proposed_for_user_id = 'me';
+    if (p.kind === 'impact' && !pp.for_display_name && p.proposed_for_user_id === viewer.user_id)
+      pp.for_display_name = viewer.display_name;
     return pp;
   });
   const state: LetterState = {
@@ -1275,13 +1554,7 @@ export async function buildState(
     },
     rule: rule ? ruleHeader(rule) : null,
     claims,
-    signers: signers.map<StateSigner>(s => ({
-      display_name: s.display_name,
-      impact_text: s.impact_text,
-      signed_at: s.signed_at,
-      added_at: s.added_at,
-      is_viewer: s.user_id === viewer.user_id,
-    })),
+    signers: stateSigners(signers, viewer),
     pending,
     missing: computeMissing(letter, claims, signers),
     activity,
@@ -1295,44 +1568,10 @@ export async function buildState(
     days_left: letter.comments_close_on ? daysLeft(letter.comments_close_on) : null,
   };
   if (!can_edit) {
-    const { share_code: _omit, ...rest } = state.letter;
-    void _omit;
-    state.letter = { ...rest, share_code: '' };
+    // docs/API.md: share_code is omitted (not blanked) when the caller cannot edit.
+    delete (state.letter as { share_code?: string }).share_code;
   }
   return state;
-}
-
-const POSITION_LABEL: Record<Position, string> = { support: 'Support', oppose: 'Oppose', modify: 'Modify' };
-
-export function exportText(letter: Letter, claims: readonly Claim[], signers: readonly Signer[], rule: RuleCacheParsed | null): string {
-  const lines: string[] = [];
-  lines.push(`Public comment on ${letter.title ?? 'a proposed rule'}`);
-  lines.push(`Federal Register document ${letter.document_number ?? '(no rule attached)'}`);
-  if (letter.agency) lines.push(`Agency: ${letter.agency}`);
-  if (letter.docket_id) lines.push(`Docket: ${letter.docket_id}`);
-  if (letter.comments_close_on) lines.push(`Comments close: ${letter.comments_close_on}`);
-  lines.push('');
-  if (claims.length === 0) lines.push('(no claims yet)');
-  claims.forEach((c, i) => {
-    const pageLabel = c.anchor_status === 'anchored' ? `Quoting page ${c.page}` : 'Quoting [QUOTE NOT VERIFIED]';
-    let line = `${i + 1}. [${POSITION_LABEL[c.position]}] ${pageLabel}: "${c.quote}" — [claimant's words] ${c.assertion}`;
-    if (c.requested_change.trim()) line += ` Requested change: [claimant's words] ${c.requested_change}`;
-    if (c.evidence.trim()) line += ` (Evidence: [claimant's words] ${c.evidence})`;
-    lines.push(line);
-    lines.push('');
-  });
-  lines.push('Signed by:');
-  if (signers.length === 0) lines.push('(no signers yet)');
-  for (const s of signers) {
-    lines.push(`- ${s.display_name}${s.signed_at ? ` (signed ${s.signed_at})` : ' (not yet signed)'}`);
-    if (s.impact_text) lines.push(`  Impact: ${s.impact_text}`);
-  }
-  lines.push('');
-  const fetched = rule?.fetched_at?.slice(0, 10) ?? letter.updated_at.slice(0, 10);
-  lines.push(
-    `Quotes verified against Federal Register document ${letter.document_number ?? '(none)'} text fetched ${fetched}. Prepared with ${APP_NAME}, an agent-assisted drafting tool; filed by a person.`,
-  );
-  return lines.join('\n');
 }
 
 /** 'HH:MM' NY clock for attribution footers. */

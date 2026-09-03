@@ -6,8 +6,14 @@ import { ACTOR_HEADER } from '../lib/app';
 import { migrate } from './db';
 import { getEnv, type DocketEnv } from './env';
 import { getCachedRule } from './fr';
-import { json } from './http';
-import { getViewer, parseCookies, serializeCookie, withCookies, type ViewerResult } from './identity';
+import { fail, json } from './http';
+import {
+  getViewer,
+  parseCookies,
+  serializeCookie,
+  withCookies,
+  type ViewerResult,
+} from './identity';
 import { actorFor, canEditLetter, loadLetter } from './letter';
 import type { Actor, Letter, RuleCacheParsed } from './types';
 
@@ -78,10 +84,6 @@ export function respond(ctx: ApiContext, body: unknown, init: ResponseInit = {})
 }
 
 export function requireEdit(ctx: LetterContext): void {
-  if (!ctx.can_edit) {
-    throw Object.assign(new Error('FORBIDDEN'), {
-      status: 403,
-      body: { error: 'FORBIDDEN', hint: 'this view cannot edit the letter; open the co-writing link' },
-    });
-  }
+  if (!ctx.can_edit)
+    fail(403, 'FORBIDDEN', 'this view cannot edit the letter; open the co-writing link');
 }
