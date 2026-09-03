@@ -216,10 +216,7 @@ export function normalizeRule(raw: string, kind: 'txt' | 'xml' | 'seed' = 'txt')
     toc.push({ heading, start });
   }
   toc.sort((a, b) => a.start - b.start);
-  if (toc.length > TOC_MAX) {
-    toc = toc.filter(t => !/E\.O\.|Executive Order/i.test(t.heading));
-  }
-  if (toc.length > TOC_MAX) toc = toc.slice(0, TOC_MAX);
+  toc = trimToc(toc);
 
   // Page marks are unique per offset (a page break that coincides with a paragraph break keeps
   // the later page number).
@@ -231,6 +228,17 @@ export function normalizeRule(raw: string, kind: 'txt' | 'xml' | 'seed' = 'txt')
   }
 
   return { text, first_page, pages: pageMarks, breaks: finalBreaks, toc };
+}
+
+/**
+ * Cap the TOC at TOC_MAX (4.2): drop the "(E.O. NNNNN)" boilerplate subsections first, then any
+ * other Executive Order heading, then truncate. Mirrors trim_toc in scripts/fixture-numbers.py.
+ */
+export function trimToc(toc: TocEntry[]): TocEntry[] {
+  let out = toc;
+  if (out.length > TOC_MAX) out = out.filter(t => !/\bE\.O\./.test(t.heading));
+  if (out.length > TOC_MAX) out = out.filter(t => !/Executive Order/i.test(t.heading));
+  return out.length > TOC_MAX ? out.slice(0, TOC_MAX) : out;
 }
 
 /** Collapse runs of spaces to one, trim, and return a map from old offsets to new offsets. */
