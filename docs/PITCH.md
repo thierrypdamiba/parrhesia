@@ -8,19 +8,31 @@ Speak up for your rights. Your agent brings the receipts.
 
 ## Short description (Devpost, GitHub About)
 
-You and your agent write a public comment on a live federal rule together. Every quote is verified
-against the rule text the page served; every signer is a real person; only you sign and file.
+When the government is about to change a rule that affects you — bike trails in national parks,
+visa fees, passport renewal — it has to ask the public first. Parrhesia lets you and your agent write
+that response together: the agent reads the fine print, you say what should change, and only you sign.
 
-## Longer
+## One paragraph
 
-Right now 191 federal proposed rules are open for public comment, and the comments that get
-answered are the ones that quote the provision and ask for a specific change. Parrhesia binds a
-letter to one live Federal Register rule. Your agent reads the rule through the page and proposes
-claims; the page refuses any quote that is not in the text it served and hands back the three nearest
-real passages. Nothing lands until you press and hold Accept — there is no accept tool. Co-signers
-sign in with ChatGPT and their own agent can draft only their statement. Parrhesia never files: a
-person pastes the letter into regulations.gov.
+Before a federal agency changes a rule, the law makes it publish the plan and take public comments
+for a month or two. Right now 191 of those are open. Most comments are ignored because they are just
+opinions; the ones the agency has to answer point at the exact sentence and ask for a specific
+change. That is hard for a person and easy for an agent, so Parrhesia lets you do it together. Your
+agent reads the whole proposal and suggests points, but the page only accepts quotes that are
+actually in the text, and nothing counts until you press and hold Accept. Friends can co-sign, each
+with their own agent. Then you file it yourself on the government's site. Parrhesia never does that
+for you.
+
+## The idea underneath
 
 The problem is not delegated thought. The problem is unexamined delegation. Parrhesia is examined
-delegation for civic speech: you decide what the agent reads, what it may propose, how it is verified,
-and you sign under your own name.
+delegation for civic speech: you decide what the agent reads, what it may propose, how it is
+verified, and you sign under your own name.
+
+## Glossary for the page (plain words first, term of art second)
+
+- a rule the government wants to change → a _proposed rule_
+- the government's daily journal where it publishes them → the _Federal Register_
+- the window when anyone can respond → the _comment period_
+- your response → a _public comment_
+- the site where you file it → _regulations.gov_

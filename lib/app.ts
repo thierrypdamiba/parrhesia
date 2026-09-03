@@ -7,8 +7,9 @@ export const APP_TAGLINE = 'Speak up for your rights. Your agent brings the rece
 
 // Second line under the wordmark and the Devpost short description.
 export const APP_DESCRIPTION =
-  'You and your agent write a public comment on a live federal rule together. ' +
-  'Every quote is verified against the rule text; every signer is a person; only you sign and file.';
+  'When the government is about to change a rule that affects you, it has to ask the public first. ' +
+  'Parrhesia lets you and your agent write that response together: the agent reads the fine print, ' +
+  'you say what should change, and only you sign.';
 
 // Integration replaces this with the production Sites URL (PLAN.md 4.1 item 1).
 export const SITE_URL = 'https://example.invalid';

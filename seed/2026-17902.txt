@@ -1,0 +1,808 @@
+<html>
+<head>
+<title>Federal Register, Volume 91 Issue 168 (Tuesday, September 1, 2026)</title>
+</head>
+<body><pre>
+[Federal Register Volume 91, Number 168 (Tuesday, September 1, 2026)]
+[Proposed Rules]
+[Pages 56095-56101]
+From the Federal Register Online via the Government Publishing Office [<a href="http://www.gpo.gov">www.gpo.gov</a>]
+[FR Doc No: 2026-17902]
+
+
+=======================================================================
+-----------------------------------------------------------------------
+
+DEPARTMENT OF THE INTERIOR
+
+National Park Service
+
+36 CFR Part 4
+
+[NPS-WASO-DTS#NPS0042897; PPMPRLE1Y.Y00000. 255P103601]
+RIN 1024-AE97
+
+
+Bicycle Use in Park Areas
+
+AGENCY: National Park Service, Interior.
+
+[[Page 56096]]
+
+
+ACTION: Proposed rule.
+
+-----------------------------------------------------------------------
+
+SUMMARY: The National Park Service (NPS) proposes to modify the 
+procedural requirements in existing NPS regulations for the designation 
+of roads and trails for bicycle use within park areas. The changes 
+would align NPS regulations with applicable Federal law and policy, 
+remove unnecessary requirements, and ensure public involvement when 
+needed. The changes in this rule would allow the NPS to manage its 
+resources and allocate taxpayer funds more efficiently and streamline 
+the approval of new and expanded opportunities for use and enjoyment of 
+park areas by the American public.
+
+DATES: Comments on the proposed rule must be received by 11:59 p.m. ET 
+on November 2, 2026.
+
+ADDRESSES: Written comments: You may submit comments by one of the 
+following methods:
+    (1) Electronically: Go to the Federal eRulemaking Portal: <a href="https://www.regulations.gov">https://www.regulations.gov</a>. In the Search box, enter 1024-AE97, the RIN for 
+this rulemaking. On the resulting page, select the Dockets tab and then 
+click on the title of the rule. Next, click the ``Open for Comments'' 
+box, then click the blue ``Comment'' box and follow the instructions 
+for submitting comments.
+    (2) By hard copy: Mail to: National Park Service Division of 
+Regulations, 7206 National Seashore Lane, Berlin, MD 21811.
+    Instructions: Comments will not be accepted by fax, email, or in 
+any way other than those specified above. All submissions received must 
+include the words ``National Park Service'' or ``NPS'' and must include 
+the docket number or RIN (1024-AE97) for this rulemaking. Comments 
+received may be posted without change to <a href="https://www.regulations.gov">https://www.regulations.gov</a>, 
+including any personal information provided.
+    Docket: For access to the docket to view the proposed rule and 
+comments received, go to <a href="https://www.regulations.gov">https://www.regulations.gov</a> and search for 
+``1024-AE97.'' Be sure to check the Dockets Tab, Documents Tab, and 
+Comment Tab for possible results.
+
+FOR FURTHER INFORMATION CONTACT: Megan Apgar, Regulations Program 
+Specialist, National Park Service; (908) 766-6841; 
+<a href="/cdn-cgi/l/email-protection#a4d3c5d7cbfbd6c1c3d1c8c5d0cdcbcad7e4cad4d78ac3cbd2"><span class="__cf_email__" data-cfemail="057264766a5a776062706964716c6a6b76456b75762b626a73">[email&#160;protected]</span></a>. Individuals in the United States who are 
+deaf, deafblind, hard of hearing, or have a speech disability may dial 
+711 (TTY, TDD, or TeleBraille) to access telecommunications relay 
+services. Individuals outside the United States should use the relay 
+services offered within their country to make international calls to 
+the point-of-contact in the United States. In compliance with the 
+Providing Accountability Through Transparency Act of 2023, the plain 
+language summary of the proposal is available on <a href="https://www.regulations.gov">https://www.regulations.gov</a> in the docket for this rulemaking.
+
+SUPPLEMENTARY INFORMATION:
+
+Bicycle Use in Park Areas
+
+    The NPS is responsible for administering the National Park System 
+of more than 400 areas and sites that preserve America's natural and 
+cultural heritage for the enjoyment of this and future generations. 
+These areas and sites include national parks, national lakeshores, 
+national seashores, national parkways, national battlefields, national 
+monuments, national preserves, national historical parks, national 
+memorials, and national recreation areas. Millions of people visit the 
+National Park System each year, many of whom seek opportunities for 
+recreation, access to points of interest, and connection to and from 
+gateway communities.
+    Bicycling is a common and popular form of access and recreation in 
+park areas, providing riders of all skill levels and ages a fun and 
+engaging way to experience their natural and cultural heritage. 
+Socioeconomic monitoring data indicates that bicycling is the most 
+popular form of active recreation within the National Park System after 
+hiking and walking.\1\ Bicycling offers visitors another option for 
+access and recreation in park areas with the added benefits to health 
+and wellness that come from physical activity. This includes use of 
+traditional bicycles and electric bicycles (e-bikes). E-bikes reduce 
+the physical demands of operating a bicycle and therefore expand 
+opportunities for recreation and access, particularly for those with 
+limitations stemming from age, illness, disability or fitness, and in 
+more challenging environments, such as high altitudes or hilly terrain. 
+Bicycling in any form helps relieve vehicle congestion on roads and in 
+parking areas. It also can mitigate some of the negative impacts motor 
+vehicles have on resources, such as air, light, and noise pollution, 
+collisions and other disturbances to wildlife, and wear on aging 
+infrastructure. Improvements to facilities, such as new or modified 
+bicycle trails, and related opportunities for riding can support 
+economies in gateway communities by attracting visitors and supporting 
+local businesses such as bicycle shops, sports stores, and restaurants.
+---------------------------------------------------------------------------
+
+    \1\ See 2024 Socioeconomic Research of National Park Service 
+Visitors: Report on 2024 Data Collection (NPS Datastore--2024 
+Socioeconomic Research of National Park Service Visitors: Report on 
+2024 Data Collection, last visited May 21, 2026).
+---------------------------------------------------------------------------
+
+Policy and Regulatory Framework
+
+    On February 19, 2025, President Trump signed Executive Order 14219, 
+``Ensuring Lawful Governance and Implementing the President's 
+`Department of Government Efficiency' Deregulatory Initiative.'' This 
+Executive Order directs Agency heads to identify regulations that are 
+based on anything other than the best reading of the underlying 
+statutory authority or prohibition. On July 3, 2025, President Trump 
+signed Executive Order 14314, ``Making America Beautiful Again by 
+Improving Our National Parks.'' This Executive Order directs the 
+Secretary of the Interior to review all of the Department's recreation 
+access rules and take steps to rescind any that unnecessarily restrict 
+recreation in national parks.
+    NPS regulations in 36 CFR 4.30 establish procedural requirements 
+for designating trails for bicycle use in park areas. These regulations 
+require the NPS to prepare an environmental assessment (EA) or an 
+environmental impact statement (EIS) that evaluates the potential 
+impacts of various actions, whether or not an EA or EIS would be 
+required by the National Environmental Policy Act (NEPA). 42 U.S.C. 
+4321 et seq. Such actions that require an EA or EIS in every case 
+include designation of existing trails that do not require any 
+construction or significant modification to accommodate bicycle use, 
+development of new trails, trail construction activities (such as 
+clearing brush, cutting trees, excavation, or surface treatment), and 
+the authorization of new trails for bicycle use. The regulations 
+require the NPS to provide the public with at least 30 days to review 
+and comment on an EA, if prepared. These requirements conflict with 
+Federal law and policy for the reasons given below.
+    Categorical exclusions are classes of actions that a Federal agency 
+has determined do not have a significant effect on the human 
+environment and therefore do not need to be evaluated in an EA or EIS. 
+Categorical exclusions are a valid compliance pathway under NEPA and 
+apply to a substantial number and type of Federal actions. Existing NPS 
+bicycle regulations, however, do not allow the NPS to use categorical 
+exclusions for the actions identified in the regulations even if doing 
+so would be appropriate under NEPA. For example, the NPS recently
+
+[[Page 56097]]
+
+adopted a categorical exclusion from the Federal Highway Administration 
+that covers ``construction of bicycle and pedestrian lands, paths, and 
+facilities.'' \2\ The NPS cannot use this categorical exclusion, 
+however, for the construction of new bicycle trails because of the 
+regulatory requirement to prepare an EA or EIS. In general, the NPS is 
+forced to conduct levels of review with resulting delays that may not 
+be justified by the scope and potential environmental effects of the 
+actions under consideration.\3\ Delays can complicate coordination with 
+the development and construction of larger trail networks outside of a 
+System unit that will connect to park trails, which increases access to 
+and from gateway communities.\4\ The NPS must use administrative 
+resources preparing EAs or EISs when those documents may not otherwise 
+be required by Federal law. This is unnecessary and results in an 
+opportunity cost for the American taxpayer because the NPS cannot use 
+such resources, including, for example, staff time and contractor fees, 
+to accomplish other management actions that benefit the public, such as 
+improving facilities that provide essential visitor services.
+---------------------------------------------------------------------------
+
+    \2\ See 90 FR 24645 adopting the categorical exclusion on June 
+11, 2025; and DOI NEPA Handbook (February 2026), Appendix 2, Section 
+16.1.G(4).
+    \3\ The NPS acknowledged this in 2012 when it published the 
+final rule for the existing regulations by stating that ``[w]hen 
+trails are sustainably located, designed, and constructed, impacts 
+[from bicycle use] are normally insignificant.'' 77 FR 39931 (July 
+6, 2012). The final rule went on to say that categorical exclusions 
+are precluded because ``there may be cases where impacts are 
+significant, including soil erosion, safety, and conflicts with 
+other users.'' Id. If impacts may be significant, however, the NPS 
+would be required to prepare an EA or EIS anyway under NEPA.
+    \4\ For example, the Marquette River Greenway will run through 
+Indiana Dunes National Park. For more information, see <a href="https://www.in.gov/nirpc/transportation/the-marquette-greenway-project-site/">https://www.in.gov/nirpc/transportation/the-marquette-greenway-project-site/</a> 
+(last visited March 23, 2026).
+---------------------------------------------------------------------------
+
+    The requirement to provide at least 30 days of public comment on an 
+EA conflicts with Departmental policy set forth in 516 DM 1--U.S. 
+Department of the Interior Handbook of NEPA Implementing Procedures 
+(the Handbook). Appendix 1, Section 1 of the Handbook states that NEPA 
+does not require public involvement when a bureau prepares an EA. The 
+Responsible Official has discretion to determine whether to involve the 
+public, when to involve the public, and what kind of public involvement 
+is most appropriate. The Handbook states that public comment periods, 
+if offered, should generally not be more than 30 days. The regulatory 
+requirement to provide the public with at least 30 days to comment on 
+an EA conflicts with the Handbook's policy providing the superintendent 
+with discretion to determine whether public involvement is appropriate, 
+and with its policy on the duration of any comment periods that are 
+offered.
+    In brief, existing NPS regulations prevent the NPS from using 
+categorical exclusions under NEPA and mandate public involvement in EA 
+preparation that is not required by NEPA and conflicts with 
+Departmental policy. Accordingly, these regulatory requirements are not 
+based on the best reading of NEPA--both on its face and as implemented 
+by Departmental policy--and should be rescinded consistent with the 
+direction in E.O. 14219.
+    In addition to the requirements discussed above, the NPS believes 
+that other requirements in the existing regulations are unnecessary and 
+should be rescinded for the reasons given below.
+    Before the NPS takes any of the actions that require an EA or EIS, 
+it also must prepare a park planning document that addresses bicycle 
+use on the existing or new trail under consideration. This planning 
+document must evaluate (1) the suitability of the trail surface and 
+soil conditions for accommodating bicycle use, including any 
+maintenance, minor rehabilitation or armoring that is necessary to 
+upgrade the trail to sustainable condition; (2) life cycle maintenance 
+costs; (3) safety considerations; (4) methods to prevent or minimize 
+user conflict; (5) methods to protect natural and cultural resources 
+and mitigate impacts; and (6) integration with commercial services and 
+alternative transportation systems (if applicable). These requirements 
+are inconsistent with the NPS's established framework for planning and 
+are redundant with compliance actions required by NEPA.
+    The NPS planning framework is designed to be flexible and give 
+superintendents discretion to determine how to meet legal and policy 
+planning requirements, including what types of plans are necessary, 
+when they should be prepared, and what should be evaluated. This design 
+allows superintendents to allocate administrative resources 
+efficiently. Requiring the superintendent to prepare a planning 
+document before taking any of the actions listed in the regulations and 
+then to evaluate the same items in the planning document regardless of 
+the scope and magnitude of the proposed action requires the NPS to 
+expend administrative resources in manner that may not create 
+commensurate value for the American public. For example, 
+superintendents and regional offices may be required to assign 
+personnel and spend time and funds preparing a park planning document 
+before allowing bicycles on an existing paved trail of minimal length 
+that would require no modification or construction to accommodate 
+bicycles, such as a 20-foot paved path connecting a parking lot with a 
+visitor center. The only way to save the administrative resources that 
+would be used on a planning document for other management actions is to 
+take no action regarding bicycle use on the trail. The result is that 
+the public is denied a new opportunity for recreation and access that 
+would otherwise be allowed as an appropriate use of the park area. The 
+NPS believes that superintendents and regional offices should have 
+discretion to prepare planning documents when necessary given the scope 
+and potential effects of the proposed action.
+    To the extent that a proposed action warrants evaluation of the 
+items listed in the existing regulations, such as construction of 
+multi-use trail network in a backcountry area, it is likely the NPS 
+would prepare an EA or EIS and evaluate those items through the NEPA 
+compliance process.\5\ This would be consistent with Departmental 
+policy. Appendix 1, Section 4 of the Handbook states that the 
+description of alternatives in an EA or EIS may include a description 
+of project maintenance, estimated costs, and modifications of existing 
+facilities. Part 1, Section 1.2 of the Handbook states that effects on 
+public health and safety should be considered in evaluating the degree 
+of effects of a proposed action or alternatives, and so too should 
+economic effects and effects on the quality of life of the American 
+people, which could include how an action would integrate with 
+commercial services and alternative transportation systems. Part 6, 
+Section 6.1 of the Handbook defines effects or impacts to include 
+ecological effects (such as effects on natural resources) and cultural 
+and economic effects. Part 1, Section 1.3 of the Handbook states that 
+NEPA requires agencies to consider reasonable mitigation measures. 
+Accordingly, compliance with NEPA likely will result in the evaluation 
+of the
+
+[[Page 56098]]
+
+items listed in the regulations, but only when the potential effects of 
+the proposed action on the human environment justify doing so pursuant 
+to Federal law and policy.
+---------------------------------------------------------------------------
+
+    \5\ The NPS acknowledged this in 2012 when it published the 
+final rule for the existing regulations by stating that ``[m]ost 
+NEPA requirements are compatible with or identical to requirements 
+for sound management planning.'' 77 FR 29928 (July 6, 2012). The 
+final rule commends the potential efficiency of using one document 
+to satisfy the requirements to prepare a park planning document and 
+an EA or EIS, but neither of those requirements need to be in the 
+regulations in the first place.
+---------------------------------------------------------------------------
+
+    The existing regulations also require the NPS to develop and 
+construct new trails in accordance with NPS sustainable trail design 
+principles and guidelines. The final rule published in 2012 that 
+established this requirement discusses the importance of sustainable 
+trails in backcountry areas. 77 FR 39929 (July 6, 2012). This 
+discussion identifies potential impacts to resources from backcountry 
+trail use and offers recommendations for mitigating those impacts by 
+ensuring that trails are sustainable. The discussion cites to several 
+laws, policies, and reference materials, some of which are now many 
+years old and no longer accessible at the source website in the 
+rule.\6\ This type of information may be useful to superintendents, 
+project managers, and others involved in trail design and development, 
+but requiring that superintendents adhere to ambiguous ``design 
+principles and guidelines'' in regulatory text offers little direction 
+or benefit to the American public. This requirement has even less 
+meaning when superintendents consider bicycle use on trails in 
+frontcountry areas, which the NPS did not address in the trail 
+sustainability discussion in 2012. This omission was understandable 
+because the types of impacts that might occur from the use of 
+unsustainable trails in primitive, undeveloped areas, such as 
+compaction and erosion of trail tread materials, in most cases are not 
+possible from the use of trails in developed areas, many of which are 
+paved. The NPS maintains established processes for design and 
+construction of various types of facilities and infrastructure across 
+the National Park System, including trails of all types.\7\ These 
+processes are subject to their own policies, compliance requirements 
+and technical standards. Because these processes are managed under 
+separate NPS authorities and procedures, decisions about physical 
+design and construction are not part of this rule. The primary purpose 
+of NPS regulations is to manage visitor use of park areas.\8\ It 
+follows that NPS regulations for bicycle use should focus on visitor 
+use of trails, not the design or construction of them before they are 
+designated.
+---------------------------------------------------------------------------
+
+    \6\ The final rule cites to a 1991 document titled ``Developing 
+Sustainable Mountain Trail Corridors: An Overview, National Park 
+Service'' and another document titled ``Guide to Sustainable 
+Mountain Trails'' that was published by the NPS in partnership with 
+the Colorado Outdoor Training Initiative in 2007.
+    \7\ See information about the NPS Park Planning, Facilities, and 
+Lands Directorate on <a href="https://www.nps.gov/orgs/1640/index.htm">https://www.nps.gov/orgs/1640/index.htm</a> (last 
+visited March 9, 2026).
+    \8\ See 36 CFR 1.2(d) stating that NPS regulations do not apply 
+to administrative activities conducted by the NPS or its agents.
+---------------------------------------------------------------------------
+
+    In addition to the requirements to prepare an EA or EIS, and the 
+requirement to prepare a park planning document, the existing 
+regulations also require the superintendent to prepare a written 
+determination that applies another set of criteria for evaluating the 
+effects of bicycle use on trails and administrative roads. 
+Administrative roads are open to motor vehicle use by the NPS for 
+administrative purposes but not open to motor vehicle use by the 
+public. Superintendents must determine that bicycle use is consistent 
+with protection of the park area's natural, scenic and aesthetic 
+values, safety considerations and management objectives, and will not 
+disturb wildlife or park resources. Regional directors must concur with 
+written determinations for bicycle use on trails. Written 
+determinations for existing trails and for new trails within developed 
+areas must be published in the Federal Register for 30 days of public 
+comment. The items that must be evaluated in the written determination 
+are confusingly similar to, but not the same, as the items that must be 
+evaluated in the park planning document. For this reason, the 
+justifications explained above for rescinding the park planning 
+document requirements also support rescinding the written determination 
+requirements. Requiring superintendents to prepare a written 
+determination in every case, even for decisions to allow bicycles on 
+administrative roads and trails that would result in minor or 
+negligible impacts to resources or visitors, forces the NPS to dedicate 
+administrative time and cost that could be put to better uses. The 
+administrative burden is even worse for proposals to allow bicycle use 
+on existing trails and on new trails in developed areas, which require 
+publication of the written determination in the Federal Register, 
+consideration of public comments, and concurrence by the regional 
+director, no matter the scope or magnitude of the potential effects of 
+the action. In addition, relying on the regulatory definition of 
+``developed area'' can create additional illogical outcomes, because 
+some areas may be developed in the ordinary sense of the word but not 
+within a designated development or historic zone on a land management 
+and use map.\9\ In such areas any new trail, no matter the scope or 
+magnitude of its impacts, will require a special regulation.\10\ 
+Similar to the items that must be evaluated in a park planning 
+document, the items that must be evaluated in a written determination 
+likely would be evaluated in an EA or EIS if preparation of those 
+documents is required under NEPA given the scope and potential effects 
+of the action.
+---------------------------------------------------------------------------
+
+    \9\ NPS regulations at 36 CFR 1.4 define ``developed area'' as 
+roads, parking areas, picnic areas, campgrounds, or other 
+structures, facilities or lands located within development and 
+historic zones depicted on the park area land management and use 
+map. Emphasis added.
+    \10\ NPS regulations at 36 CFR 4.30(e)(2) require promulgation 
+of a special regulation prior to developing, constructing, or 
+authorizing new trails outside of developed areas for bicycle use.
+---------------------------------------------------------------------------
+
+    A final requirement in the regulations prevents the NPS from 
+allowing bicycle use on existing trails if the Finding of No 
+Significant Impact or Record of Decision that follows the preparation 
+of an EA or EIS concludes that such action may have a significant 
+impact on the environment. It is not clear why this requirement applies 
+to existing trails but not to new trails. The distinction between an 
+existing and a new trail ceases after the new trail is built, at which 
+point the potential impacts of allowing bicycle use on the trail can be 
+the same. Another problem is that this requirement establishes a 
+substantive standard for allowable impacts that is different from the 
+non-impairment standard in the NPS Organic Act and the standard in NPS 
+Management Policies that prevents the NPS from allowing unacceptable 
+impacts from visitor use. See 54 U.S.C. 100101 and NPS Management 
+Policies 2006, Section 1.4.7.1. There is no basis for applying a 
+standard for impacts from bicycle use that is different from the 
+standards that apply to impacts from other visitor activities. 
+Superintendents should follow established NPS policy about appropriate 
+use of park areas when making decisions about bicycle use. Additional 
+confusion may arise because the significance standard used in the 
+regulations refers to specific determinations made in the NEPA 
+compliance process, but the regulations use this standard as a 
+substantive limitation on decision-making, while NEPA purposefully does 
+not. NEPA is a procedural statute requiring Federal agencies to 
+evaluate the environmental impacts of proposed actions, but does not 
+mandate specific outcomes or limit agency decision-making.\11\
+---------------------------------------------------------------------------
+
+    \11\ See Seven County Infrastructure Coalition v. Eagle County, 
+605 U.S. 168, 169 (2025) (``Otherwise stated, NPS `does not mandate 
+particular results, but simply prescribes the necessary process' for 
+an agency's environmental review of a project.'' (quoting Roberston 
+v. Methow Valley Citizens Council, 490 U.S. 332, 350 (1989)).
+
+---------------------------------------------------------------------------
+
+[[Page 56099]]
+
+    None of the procedural requirements that would be rescinded by this 
+rule exist in general regulations that address other types of visitor 
+recreation and access in park areas.\12\ These include regulations for 
+designating lands and waters for operating or using aircraft (36 CFR 
+2.17), routes and water surfaces for the use of snowmobiles (36 CFR 
+2.18), areas for using human-powered coasting devices such as roller 
+skates, skateboards, and scooters (36 CFR 2.20), waters for the use of 
+personal watercraft (PWC) (36 CFR 3.9), routes and areas for off-road 
+vehicle (ORV) use (36 CFR 4.10), and locations for the operation of 
+powered micromobility devices, such as e-scooters (36 CFR 4.32). None 
+of them address the design, development, or construction of routes, 
+trails, paths, traffic barriers, or other physical assets that are used 
+for the visitor activities and uses described. Some of these 
+regulations address devices similar to traditional bicycles, such as 
+the regulations for human-powered coating devices, and similar to e-
+bikes, such as the regulations for powered micromobility devices. 
+Others manage devices such as aircraft, snowmobiles, PWCs, and ORVs 
+that have the potential to impact resources and visitors well beyond 
+what is possible from bicycles and e-bikes due to their weight, speed 
+of operation, use of internal combustion engines, and other 
+characteristics of use. Some of these regulations require notice and 
+comment rulemaking to ensure there is public involvement before certain 
+uses are allowed. Notice and comment rulemaking is required to 
+designate any location for the use of aircraft, snowmobiles, PWC, and 
+ORVs. These requirements are justified because these types of 
+activities have greater potential for impacts no matter the location. 
+Rulemaking is required before allowing powered micromobility devices in 
+locations that have never been improved by artificial or processed 
+materials such as paving or gravel. This requirement is justified 
+because the use of powered micromobility devices in these locations has 
+potential for greater impacts than use in other locations, such as 
+paved pathways.
+---------------------------------------------------------------------------
+
+    \12\ NPS regulations that govern the gathering of plants or 
+plant parts by federally recognized Indian tribes require the 
+preparation of an EA. 36 CFR 2.6(d)(2). The NPS does not consider 
+this activity to be visitor recreation or access due to the special 
+relationship between the NPS and federally-recognized Indian tribes, 
+which are sovereign governments.
+---------------------------------------------------------------------------
+
+    In summary, the NPS believes that the requirements in 36 CFR 4.30 
+discussed above unnecessarily restrict recreation and access by making 
+it more difficult than needed to authorize administrative roads and 
+trails for bicycle use. Therefore they should be rescinded consistent 
+with the direction in Executive Order 14314. This proposed rule would 
+allow the NPS to manage its resources and allocate taxpayer funds more 
+efficiently and streamline the approval of new and expanded 
+opportunities for use and enjoyment of park areas by the American 
+public. Key elements of the proposed rule are discussed below.
+
+Proposed Rule
+
+    Identifying new opportunities for responsible outdoor recreation in 
+park areas is a priority for the Trump Administration and the NPS. This 
+includes identifying new and expanded opportunities for bicycle use 
+where appropriate. The proposed rule would simplify how the NPS allows 
+bicycle and e-bike use in park areas for the benefit of the American 
+public. Bicycles and e-bikes would be allowed on park roads and in 
+parking areas that are otherwise open for motor vehicle use by the 
+general public. This would not change the status quo for traditional 
+bicycles, but it would for e-bikes by removing the need for 
+superintendents to take affirmative action to allow them in those 
+locations by designation. Setting the same baseline for the use of all 
+forms of bicycles on roads and in parking areas would simplify 
+administration and make the regulations easier to understand. The 
+superintendent would have authority to designate other locations, 
+including administrative roads and trails, for bicycle and e-bike use 
+except that rulemaking in the Federal Register would be required to 
+allow bicycles or e-bikes in two circumstances. First, rulemaking would 
+be required if the designation would be highly controversial or 
+otherwise significant according to the criteria in paragraph (b) of 36 
+CFR 1.5.\13\ Second, rulemaking would be required before bicycles or e-
+bikes are allowed in locations that have never been improved by 
+artificial or processed materials. Artificial or processed materials 
+include gravel, asphalt, concrete, wood boards, soil cement, and resin-
+based material. Rulemaking would not be required for locations with 
+surfaces composed of these materials at present, nor for locations that 
+have a natural surface at present but in the past were altered or 
+improved by artificial or processed materials, such as trails located 
+on top of old rail lines. The purpose of the rulemaking requirements in 
+this rule is to ensure public involvement in decision-making that has 
+more potential for impacts to park resources, values, and visitors, or 
+when stakeholders such as gateway communities have strong viewpoints 
+about potential designations. Related to trail characteristics, the NPS 
+seeks specific comment from the public about criteria that could be 
+used to determine whether rulemaking is required. An example is whether 
+rulemaking should not be required to designate certain locations that 
+have never been improved by artificial or processed materials but that 
+have other characteristics that might lessen the potential for impacts, 
+such as public beaches.
+---------------------------------------------------------------------------
+
+    \13\ Rulemaking is required for an action ``which is of a 
+nature, magnitude and duration that will result in a significant 
+alteration in the public use pattern of the park area, adversely 
+affect the park's natural, aesthetic, scenic or cultural values, 
+require a long-term or significant modification in the resource 
+management objectives of the unit . . . .'' 36 CFR 1.5(b).
+---------------------------------------------------------------------------
+
+    The proposed rule would maintain several provisions in the existing 
+regulations that do not need revision. The definitions of ``bicycle'' 
+and ``electric bicycle'' in 36 CFR 1.4 would remain the same. So would 
+the existing prohibition on possessing a bicycle or e-bike in a 
+wilderness area established by Federal statute and other restrictions 
+on the operation of a bicycle or e-bike that promote visitor 
+safety.\14\ The rule would maintain an existing prohibition on using 
+the electric motor to exclusively propel an e-bike for an extended 
+period of time, except where use of motor vehicles is allowed. This 
+only affects Class-2 e-bikes and helps ensure that they are used for 
+access and recreation in a similar manner to traditional bicycles. The 
+rule would continue to apply state law to the use of bicycles and e-
+bikes except as provided in NPS regulations. Finally, the rule would 
+maintain the authority given to superintendents to establish bicycle or 
+e-bike use limitations, restrictions, conditions, and closures after 
+consideration of public health and safety, resource protection, and 
+other management activities and objectives. This rule would add a new 
+provision, however, clarifying that permanent closures of park roads 
+and parking areas that are otherwise open for motor vehicle use by the 
+general public, or of administrative roads, trails, and other
+
+[[Page 56100]]
+
+locations that are designated by rulemaking, must be promulgated as 
+special regulations for the applicable System unit. The only exception 
+would be for closures of park roads and parking areas that exist under 
+state law. This exception would be compatible with the NPS's general 
+adoption of state traffic laws in 36 CFR 4.2.
+---------------------------------------------------------------------------
+
+    \14\ For example, 36 CFR 4.30(h)(5) prohibits operating a 
+bicycle while consuming an alcoholic beverage or carrying in hand an 
+open container of an alcoholic beverage, and is applied to e-bikes 
+in 36 CFR 4.30(i)(5). As another example, 36 CFR 4.12 requires 
+compliance with the directions of a traffic control device. It is 
+applied to bicycles in 36 CFR 4.30(g)(1) and to e-bikes in 36 CFR 
+4.30(i)(5).
+---------------------------------------------------------------------------
+
+Compliance With Other Laws, Executive Orders and Department Policy
+
+Regulatory Planning and Review (Executive Orders 12866 and 14192)
+
+    This rule has been determined to be not significant for purposes of 
+Executive Order 12866. This rule is an E.O. 14192 deregulatory action. 
+The NPS expects this rule would result in net economic benefits due to 
+reduced administrative costs. Administrative costs associated with the 
+requirements in the existing regulations to prepare a planning 
+document, an EA or EIS, and a written determination would be eliminated 
+in situations where such actions are not warranted.
+
+Regulatory Flexibility Act
+
+    This proposed rule will not have a significant economic effect on a 
+substantial number of small entities under the Regulatory Flexibility 
+Act (5 U.S.C. 601 et seq.). No small entities would be directly 
+regulated by this rule, which would modify existing NPS regulations to 
+simplify how the NPS allows traditional and electric bicycle use in 
+park areas. The proposed changes would remove unnecessary requirements, 
+reduce regulatory burden, and allow the NPS to streamline the approval 
+of new and expanded opportunities for use and enjoyment of park areas 
+by the American public. While the changes in this rule are procedural 
+in nature, they could result in a small increase in recreational 
+visitation, thereby benefitting nearby small businesses through 
+increased visitor spending. This proposed rule would not generate new 
+costs for small businesses, organizations, or governmental 
+jurisdictions, nor would it impose fees, operational requirements, 
+training, recordkeeping, or other compliance burdens on small 
+businesses or organizations. It is not expected to have adverse 
+economic effects on any sector, including small entities. For these 
+reasons, the NPS certifies that this rule will not have a significant 
+economic impact on a substantial number of small entities; therefore, a 
+regulatory flexibility analysis is not required.
+
+Congressional Review Act
+
+    This proposed rule is not a major rule under 5 U.S.C. 804(2). This 
+proposed rule:
+    (a) Would not have an annual effect on the economy of $100 million 
+or more.
+    (b) Would not cause a major increase in costs or prices for 
+consumers, individual industries, Federal, State, or local government 
+agencies, or geographic regions.
+    (c) Would not have significant adverse effects on competition, 
+employment, investment, productivity, innovation, or the ability of 
+U.S.-based enterprises to compete with foreign-based enterprises.
+
+Unfunded Mandates Reform Act
+
+    This proposed rule would not impose an unfunded mandate on State, 
+local, or Tribal governments or the private sector of more than $100 
+million per year. This proposed rule would not have a significant or 
+unique effect on State, local or Tribal governments, or the private 
+sector. It addresses public use of national park lands and imposes no 
+requirements on other agencies or governments. A statement containing 
+the information required by the Unfunded Mandates Reform Act (2 U.S.C. 
+1531 et seq.) is not required.
+
+Takings (E.O. 12630)
+
+    This proposed rule would not effect a taking of private property or 
+otherwise have takings implications under E.O. 12630. A takings 
+implication assessment is not required.
+
+Federalism (E.O. 13132)
+
+    Under the criteria in section 1 of E.O. 13132, this proposed rule 
+would not have sufficient federalism implications to warrant the 
+preparation of a Federalism summary impact statement. This rule would 
+only affect use of federally administered lands. It would have no 
+direct effects on other areas. A Federalism summary impact statement is 
+not required.
+
+Civil Justice Reform (E.O. 12988)
+
+    This proposed rule complies with the requirements of E.O. 12988. 
+This proposed rule:
+    (a) Meets the criteria of section 3(a) requiring that all 
+regulations be reviewed to eliminate errors and ambiguity and be 
+written to minimize litigation; and
+    (b) Meets the criteria of section 3(b)(2) requiring that all 
+regulations be written in clear language and contain clear legal 
+standards.
+
+Consultation With Indian Tribes (E.O. 13175 and Department Policy)
+
+    The Department of the Interior strives to strengthen its 
+government-to-government relationship with Indian Tribes through a 
+commitment to consultation with Indian Tribes and recognition of their 
+right to self-governance and Tribal sovereignty. The NPS has evaluated 
+this proposed rule under the criteria in E.O. 13175 and under the 
+Department's Tribal consultation policy and has determined that Tribal 
+consultation is not required because this rule will have no substantial 
+direct effect on federally recognized Indian Tribes and that 
+consultation under the Department's tribal consultation policy is not 
+required.
+
+Paperwork Reduction Act of 1995 (44 U.S.C. 3501 et seq.)
+
+    This rule contains no new information collections. All information 
+collections require approval under the Paperwork Reduction Act of 1995 
+(44 U.S.C. 3501 et seq.). The NPS may not conduct or sponsor, and you 
+are not required to respond to a collection of information, unless it 
+displays a currently valid Office of Management and Budget (OMB) 
+control number.
+
+National Environmental Policy Act of 1969 (NEPA; 42 U.S.C. 4321 et 
+seq.)
+
+    This rule does not constitute a major Federal action significantly 
+affecting the quality of the human environment. A detailed statement 
+under the National Environmental Policy Act of 1969 (NEPA) is not 
+required because the rule is covered by categorical exclusions. This 
+rule does not involve any of the extraordinary circumstances listed in 
+43 CFR 46.215 that would require further analysis under NEPA. The NPS 
+has determined the change in the rule that would allow e-bikes on park 
+roads and parking areas that are otherwise open for motor vehicle use 
+by the general public, without the need for superintendents to take 
+affirmative action to allow them in those locations by designation, is 
+categorically excluded under Appendix 2, Section 12.5.D(4) of the 
+Handbook, which covers minor changes in programs and regulations 
+pertaining to visitor activities. The NPS has determined that all other 
+changes in this rule are categorically excluded under 43 CFR 46.210(i), 
+which covers minor policies, directives, regulations, and guidelines: 
+that are of an administrative, financial, legal, technical, or 
+procedural nature; or whose environmental effects are too broad, 
+speculative, or conjectural to
+
+[[Page 56101]]
+
+lend themselves to meaningful analysis and will later be subject to the 
+NEPA process, either collectively or case-by-case. The NPS will 
+document the application of these categorical exclusions to this rule.
+
+Effects on the Energy Supply (E.O. 13211)
+
+    This proposed rule is not a significant energy action under the 
+definition in E.O. 13211; this proposed rule is not likely to have a 
+significant adverse effect on the supply, distribution, or use of 
+energy, and this proposed rule has not otherwise been designated by the 
+Administrator of OIRA as a significant energy action. A Statement of 
+Energy Effects is not required.
+
+List of Subjects in 36 CFR Part 4
+
+    National Parks, Traffic regulations.
+
+    In consideration of the foregoing, the National Park Service 
+proposes to amend 36 CFR part 4 as set forth below:
+
+PART 4--VEHICLES AND TRAFFIC SAFETY
+
+0
+1. The authority citation for part 4 continues to read as follows:
+
+    Authority:  54 U.S.C. 100101, 100751, 320102.
+
+
+0
+2. Revise and republish Sec.  4.30 as follows:
+
+
+Sec.  4.30  Bicycles.
+
+    (a) Park roads and parking areas. The use of bicycles and electric 
+bicycles is allowed on park roads and in parking areas that are 
+otherwise open for motor vehicle use by the general public.
+    (b) Other locations. The use of bicycles and electric bicycles is 
+allowed in other locations designated by the superintendent after 
+notice is provided using one or more of the methods described in Sec.  
+1.7 of this chapter. Locations must be designated by rulemaking in the 
+Federal Register when the designation would meet the criteria in 
+paragraph (b) of Sec.  1.5 of this chapter. Rulemaking in the Federal 
+Register also is required before bicycles or electric bicycles are 
+allowed in locations that have never been improved by artificial or 
+processed materials. Artificial or processed materials include, but are 
+not limited to, gravel, asphalt, concrete, steel rail lines, wood 
+boards, soil cement, and resin-based material.
+    (c) Closures and other use restrictions. (1) A superintendent may 
+limit or restrict or impose conditions on bicycle use or electric 
+bicycle use, or may close any park road, parking area, administrative 
+road, trail, or other location, or a portion thereof, to bicycle or 
+electric bicycle use, or terminate such condition, closure, limit or 
+restriction after:
+    (i) Taking into consideration public health and safety, natural and 
+cultural resource protection, and other management activities and 
+objectives; and
+    (ii) Notifying the public through one or more methods listed in 
+Sec.  1.7 of this chapter.
+    (2) A closure of all or a portion of a park road or parking area 
+that is otherwise open for motor vehicle use by the general public, or 
+all or a portion of an administrative road, trail, or other location 
+designated by rulemaking, may not remain in effect on a permanent basis 
+unless it is promulgated as a special regulation, except that a special 
+regulation is not required for a closure of all or a portion of a park 
+road or parking area that exists under state law.
+    (d) Prohibited acts. The following are prohibited:
+    (1) Operating a bicycle or an electric bicycle off of park roads 
+and parking areas in locations not designated for their use in 
+accordance with this section.
+    (2) Possessing a bicycle or an electric bicycle in a wilderness 
+area established by Federal statute.
+    (3) Operating a bicycle or an electric bicycle during periods of 
+low visibility, or while traveling through a tunnel, or between sunset 
+and sunrise, without exhibiting on the operator, bicycle, or electric 
+bicycle a white light or reflector that is visible from a distance of 
+at least 500 feet to the front and with a red light or reflector that 
+is visible from at least 200 feet to the rear.
+    (4) Operating a bicycle or an electric bicycle abreast of another 
+bicycle or electric bicycle except where authorized by the 
+superintendent.
+    (5) Operating a bicycle or an electric bicycle while consuming an 
+alcoholic beverage or carrying in hand an open container of an 
+alcoholic beverage.
+    (6) Except where use of motor vehicles by the public is allowed, 
+using the electric motor exclusively to move an electric bicycle for an 
+extended period of time.
+    (e) Other requirements. (1) A person operating or possessing a 
+bicycle or an electric bicycle is subject to the following sections of 
+this part that also apply to the operation of a motor vehicle: 
+Sec. Sec.  4.12, 4.13, 4.20, 4.21, 4.22, and 4.23.
+    (2) Except as specified in this chapter, the use of a bicycle or an 
+electric bicycle is allowed in compliance with applicable State law. 
+Any act in violation of applicable State law is prohibited.
+
+Kevin Lilly,
+Principal Deputy, Assistant Secretary for Fish and Wildlife and Parks.
+[FR Doc. 2026-17902 Filed 8-31-26; 8:45 am]
+BILLING CODE 4312-52-P
+
+
+</pre><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>
